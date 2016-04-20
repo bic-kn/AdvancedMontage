@@ -106,16 +106,6 @@ public class MontageTool extends AbstractTool
 		
 		// Get active LUTs
 		LUT[] luts = imp.getLuts();
-	
-//		if (imp.isComposite()) {
-//			CompositeImage ci = (CompositeImage)imp;
-//			if (ci.getMode()==IJ.COMPOSITE) {
-//				Color c = ci.getChannelColor();
-//				if (Color.green.equals(c))
-//					c = new Color(0,180,0);
-//				g.setColor(c);
-//			}
-//		}
 		
 		montageFrame = new MontageFrame(luts, this);
 	}

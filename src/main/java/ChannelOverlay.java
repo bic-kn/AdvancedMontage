@@ -9,8 +9,19 @@ import java.awt.Color;
  */
 public class ChannelOverlay extends MontageItemOverlay {
 
-	public ChannelOverlay(Color color) {
+	private int channel;
+
+	public ChannelOverlay(Color color, int channel) {
 		super(color);
+		
+		this.channel = channel;
+	}
+	
+	/**
+	 * @return the channel
+	 */
+	public int getChannel() {
+		return channel;
 	}
 
 }

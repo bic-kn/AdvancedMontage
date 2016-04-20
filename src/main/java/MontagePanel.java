@@ -17,9 +17,11 @@ public class MontagePanel extends JPanel {
 	protected LUT[] luts;
 	private final static int ROWS = 4;
 	private final static int COLUMNS = 4;
+	private MontageTool tool;
 	
-	public MontagePanel(LUT[] luts) {
+	public MontagePanel(LUT[] luts, MontageTool tool) {
 		this.luts = luts;
+		this.tool = tool;
 		
 		placeComponents();
 	}
@@ -36,7 +38,7 @@ public class MontagePanel extends JPanel {
 		// TODO Set the defaults
 		ComponentMover cm = new ComponentMover();
 		for (int i=0; i<ROWS*COLUMNS; i++) {
-			MontageItem item = new MontageItem();
+			MontageItem item = new MontageItem(tool);
 			this.add(item);
 			cm.registerComponent(item);
 		}

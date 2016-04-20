@@ -3,14 +3,14 @@ import java.util.Observable;
 import java.util.Observer;
 
 import ij.CompositeImage;
+import ij.IJ;
 import ij.ImagePlus;
 import ij.ImageStack;
 import ij.gui.ImageRoi;
 import ij.gui.Overlay;
-import ij.measure.Calibration;
-import ij.plugin.ScaleBar;
 import ij.process.ByteProcessor;
 import ij.process.ImageProcessor;
+import ij.process.LUT;
 
 public class MontageCompiler implements Observer {
 
@@ -46,19 +46,31 @@ public class MontageCompiler implements Observer {
 			return;
 		}
 		
+		LUT[] luts = inputImp.getLuts();
+		
 		// Create composite from ChannelOverlays
 		ImageStack stack = new ImageStack(inputWidth, inputHeight);
 		for (MontageItemOverlay overlay : item.getOverlays()) {
 			if (overlay instanceof ChannelOverlay) {
-				ImageProcessor channelImageProcessor = extractChannelFromInput(overlay, inputImp);
+				ImageProcessor channelImageProcessor = extractChannelFromInput((ChannelOverlay) overlay);
+				channelImageProcessor.setLut(luts[((ChannelOverlay) overlay).getChannel()-1]);
 				stack.addSlice(channelImageProcessor);
 			}
 		}
 		ImagePlus tempImp = new ImagePlus("Composite Temp", stack);
+		if (IJ.debugMode) {
+			tempImp.show();
+		}
 		CompositeImage compositeImage = new CompositeImage(tempImp);
+		compositeImage.setMode(CompositeImage.COMPOSITE);
+		if (IJ.debugMode) {
+			compositeImage.show();
+		}
 		ImagePlus flattenedImp = compositeImage.flatten();
+		if (IJ.debugMode) {
+			flattenedImp.show();
+		}
 		
-		// TODO Add to output at correct position
 		ImageRoi flattenedImpRoi = new ImageRoi(item.getColumn()*inputWidth, item.getRow()*inputHeight, flattenedImp.getProcessor());
 		
 		Overlay overlay = outputImp.getOverlay();
@@ -71,11 +83,11 @@ public class MontageCompiler implements Observer {
 		// TODO Add scalebar and ROIs
 	}
 	
-	private ImageProcessor extractChannelFromInput(MontageItemOverlay overlay, ImagePlus inputImp) {
+	private ImageProcessor extractChannelFromInput(ChannelOverlay overlay) {
 		ImageStack stack = inputImp.getStack();
 		
 		// TODO Return processor for overlay channel
-		return stack.getProcessor(1);
+		return stack.getProcessor(overlay.getChannel());
 	}
 
 	int numberOfOutputColumns() {

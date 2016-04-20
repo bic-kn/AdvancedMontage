@@ -31,6 +31,7 @@ class MontageItem extends JButton implements ActionListener, ItemListener {
 
 	private List<MontageItemOverlay> overlays = new ArrayList<>();
 	private MontageItemPopup menu;
+	private MontageTool tool;
 	
 	/** TODO */
 	private boolean drawOverlay = false;
@@ -38,12 +39,14 @@ class MontageItem extends JButton implements ActionListener, ItemListener {
 	/** TODO */
 	private boolean drawRois = false;
 	
-	public MontageItem() {
+	public MontageItem(MontageTool tool) {
+		this.tool = tool;
+		
 		this.setBackground(new Color(59, 89, 182));
 		this.setContentAreaFilled(false);
 		this.setBorderPainted(true);
 		this.setBorder(new MontagePanelItemBorder());
-
+		
 		addActionListener(new ActionListener() {
 
 			@Override
@@ -143,10 +146,11 @@ class MontageItem extends JButton implements ActionListener, ItemListener {
 				overlays.clear();
 				menu.clearMenu();
 			} else if (item.getName().equals("compositeItem")) {
-				// TODO Add all channels and active items
-				overlays.add(new ChannelOverlay(Color.RED));
-				overlays.add(new ChannelOverlay(Color.GREEN));
-				overlays.add(new ChannelOverlay(Color.BLUE));
+				for (int i = 1; i <= tool.getImp().getNChannels(); i++) {
+					MontageItemOverlay overlayForChannel = MontageUtil
+							.getOverlayForChannel(tool.getImp(), i);
+					overlays.add(overlayForChannel);
+				}
 				menu.composite();
 			}
 		}
@@ -197,11 +201,17 @@ class MontageItem extends JButton implements ActionListener, ItemListener {
 					item.setState(false);
 				}
 			} else {
+				// TODO Handle exceptions / improve in general
+				String[] splitName = item.getName().split("-");
+				MontageItemOverlay overlayForChannel = MontageUtil
+						.getOverlayForChannel(tool.getImp(),
+								Integer.parseInt(splitName[1]));
+				
 				if (e.getStateChange() == ItemEvent.SELECTED) {
-					// TODO Determine color for the overlay
-					overlays.add(new ChannelOverlay(Color.GREEN));
+					overlays.add(overlayForChannel);
 				} else if (e.getStateChange() == ItemEvent.DESELECTED) {
 					// TODO Remove overlay
+					overlays.remove(overlayForChannel);
 				}
 			}
 			

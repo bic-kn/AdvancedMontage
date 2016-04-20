@@ -31,7 +31,7 @@ public class MontageFrame extends JFrame implements ActionListener {
 		button = new JButton("Compile montage");
 		button.addActionListener(this);
 		
-		panel = new MontagePanel(luts);
+		panel = new MontagePanel(luts, montageTool);
 		
 		frame.getContentPane().add(BorderLayout.SOUTH, button);
 		frame.getContentPane().add(BorderLayout.CENTER, panel);

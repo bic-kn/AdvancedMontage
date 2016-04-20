@@ -20,10 +20,6 @@ class MontageItemPopup extends PopupMenu {
 		// FIXME Call init()
 	}
 
-	public MontageItemPopup() {
-		this.montagePanel = new MontagePanel(null);
-	}
-
 	private MontageItem item;
 	private MenuItem clearItem;
 	private MenuItem compositeItem;
@@ -41,11 +37,13 @@ class MontageItemPopup extends PopupMenu {
 
 		// For all available channels in the image
 		channelItems = new ArrayList<>();
+		int i = 1;
 		for (LUT lut : this.montagePanel.luts) {
 			// TODO Check if an overlay exists for that LUT
 			CheckboxMenuItem channelItem = new CheckboxMenuItem(MontageUtil.getLUTName(lut),
 					item.overlaysContain(lut) ? true : false);
 			channelItems.add(channelItem);
+			channelItem.setName("channel-"+i++);
 			channelItem.addItemListener(item);
 			this.add(channelItem);
 		}
