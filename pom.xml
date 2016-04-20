@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+		http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>net.imagej</groupId>
+		<artifactId>pom-imagej</artifactId>
+		<version>7.0.0</version>
+		<relativePath />
+	</parent>
+
+	<groupId>sc.fiji</groupId>
+	<artifactId>Advanced_Montage</artifactId>
+	<version>0.1.0-SNAPSHOT</version>
+
+	<name>plugins/Advanced_Montage.jar</name>
+	<description>A plugin with advanced functionality for montage creation. Borrows ideas from Make_Montage as well as the Magic Montage macro toolset.</description>
+
+	<developers>
+		<developer>
+			<id>stelfrich</id>
+			<name>Stefan Helfrich</name>
+			<email>stefan.helfrich@uni-konstanz.de</email>
+			<url>http://bioimagingcenter.uni-konstanz.de</url>
+			<organization>University of Konstanz</organization>
+			<organizationUrl>http://bioimagingcenter.uni-konstanz.de</organizationUrl>
+			<roles>
+				<role>architect</role>
+				<role>developer</role>
+			</roles>
+		</developer>
+	</developers>
+
+	<!-- <scm>
+		<connection>scm:git:git://github.com/imagej/minimal-ij1-plugin</connection>
+		<developerConnection>scm:git:git@github.com:imagej/minimal-ij1-plugin</developerConnection>
+		<tag>HEAD</tag>
+		<url>https://github.com/imagej/minimal-ij1-plugin</url>
+	</scm> -->
+
+	<properties>
+		<main-class>MontageTool</main-class>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>net.imagej</groupId>
+			<artifactId>ij</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>sc.fiji</groupId>
+			<artifactId>fiji-lib</artifactId>
+			<version>2.1.1</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifest>
+							<mainClass>${main-class}</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+		      <plugin>
+		        <groupId>org.apache.maven.plugins</groupId>
+		        <artifactId>maven-compiler-plugin</artifactId>
+		        <configuration>
+		          <source>1.8</source>
+		          <target>1.8</target>
+		        </configuration>
+		      </plugin>
+		</plugins>
+	</build>
+
+	<repositories>
+		<repository>
+			<id>imagej.public</id>
+			<url>http://maven.imagej.net/content/groups/public</url>
+		</repository>
+		<repository>
+			<id>imagej.releases</id>
+			<url>http://maven.imagej.net/content/repositories/releases</url>
+		</repository>
+		<repository>
+			<id>imagej.snapshots</id>
+			<url>http://maven.imagej.net/content/repositories/snapshots</url>
+		</repository>
+	</repositories>
+
+</project>
