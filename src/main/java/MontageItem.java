@@ -32,6 +32,12 @@ class MontageItem extends JButton implements ActionListener, ItemListener {
 	private List<MontageItemOverlay> overlays = new ArrayList<>();
 	private MontageItemPopup menu;
 	
+	/** TODO */
+	private boolean drawOverlay = false;
+	
+	/** TODO */
+	private boolean drawRois = false;
+	
 	public MontageItem() {
 		this.setBackground(new Color(59, 89, 182));
 		this.setContentAreaFilled(false);
@@ -135,8 +141,13 @@ class MontageItem extends JButton implements ActionListener, ItemListener {
 			MenuItem item = (MenuItem) e.getSource();
 			if (item.getName().equals("clearItem")) {
 				overlays.clear();
+				menu.clearMenu();
 			} else if (item.getName().equals("compositeItem")) {
 				// TODO Add all channels and active items
+				overlays.add(new ChannelOverlay(Color.RED));
+				overlays.add(new ChannelOverlay(Color.GREEN));
+				overlays.add(new ChannelOverlay(Color.BLUE));
+				menu.composite();
 			}
 		}
 		

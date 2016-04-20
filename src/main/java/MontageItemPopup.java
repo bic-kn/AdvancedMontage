@@ -1,14 +1,14 @@
 import java.awt.CheckboxMenuItem;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
+import java.util.ArrayList;
+import java.util.List;
 
 import ij.process.LUT;
 
 class MontageItemPopup extends PopupMenu {
 
-	/**
-	 * 
-	 */
+	/** TODO */
 	private final MontagePanel montagePanel;
 
 	/**
@@ -16,46 +16,51 @@ class MontageItemPopup extends PopupMenu {
 	 */
 	MontageItemPopup(MontagePanel montagePanel) {
 		this.montagePanel = montagePanel;
+		
+		// FIXME Call init()
 	}
 
 	public MontageItemPopup() {
 		this.montagePanel = new MontagePanel(null);
 	}
 
-	MontageItem item;
-
+	private MontageItem item;
+	private MenuItem clearItem;
+	private MenuItem compositeItem;
+	private CheckboxMenuItem roiItem;
+	private CheckboxMenuItem scalebarItem;
+	private List<CheckboxMenuItem> channelItems;
+	
 	public void init() {
 		this.item = (MontageItem) getParent();
 
-		// Add "Clear" item
-		MenuItem clearItem = new MenuItem("Clear");
+		clearItem = new MenuItem("Clear");
 		clearItem.setName("clearItem");
 		clearItem.addActionListener(item);
 		this.add(clearItem);
 
 		// For all available channels in the image
+		channelItems = new ArrayList<>();
 		for (LUT lut : this.montagePanel.luts) {
 			// TODO Check if an overlay exists for that LUT
 			CheckboxMenuItem channelItem = new CheckboxMenuItem(MontageUtil.getLUTName(lut),
 					item.overlaysContain(lut) ? true : false);
+			channelItems.add(channelItem);
 			channelItem.addItemListener(item);
 			this.add(channelItem);
 		}
 
-		// Add "Composite" item
-		MenuItem compositeItem = new MenuItem("Composite");
+		compositeItem = new MenuItem("Composite");
 		compositeItem.setName("compositeItem");
 		compositeItem.addActionListener(item);
 		this.add(compositeItem);
 
-		// Add "ROI" item
-		CheckboxMenuItem roiItem = new CheckboxMenuItem("ROI", false);
+		roiItem = new CheckboxMenuItem("ROI", false);
 		roiItem.setName("roiItem");
 		roiItem.addItemListener(item);
 		this.add(roiItem);
 
-		// Add "Scalebar" item
-		CheckboxMenuItem scalebarItem = new CheckboxMenuItem("Scalebar", false);
+		scalebarItem = new CheckboxMenuItem("Scalebar", false);
 		scalebarItem.setName("scalebarItem");
 		scalebarItem.addItemListener(item);
 		this.add(scalebarItem);
@@ -63,5 +68,31 @@ class MontageItemPopup extends PopupMenu {
 
 	public void update() {
 		// TODO
+	}
+	
+	public void clearMenu() {
+		clearChannels();
+		clearRoi();
+		clearScalebar();
+	}
+
+	private void clearChannels() {
+		for (CheckboxMenuItem channelItem : channelItems) {
+			channelItem.setState(false);
+		}
+	}
+	
+	private void clearRoi() {
+		roiItem.setState(false);
+	}
+	
+	private void clearScalebar() {
+		scalebarItem.setState(false);
+	}
+
+	public void composite() {
+		for (CheckboxMenuItem channelItem : channelItems) {
+			channelItem.setState(true);
+		}
 	}
 }
