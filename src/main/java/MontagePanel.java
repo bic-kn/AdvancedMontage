@@ -40,9 +40,10 @@ public class MontagePanel extends JPanel {
 		for (int i=0; i<ROWS*COLUMNS; i++) {
 			MontageItem item = new MontageItem(tool);
 			this.add(item);
+			
 			cm.registerComponent(item);
 		}
-	    
+		
 	    // TODO Set correct snap size
 	    cm.setSnapSize(new Dimension(40, 40));
 	}

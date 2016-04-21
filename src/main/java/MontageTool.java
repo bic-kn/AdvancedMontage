@@ -17,6 +17,7 @@ import ij.IJ;
 import ij.ImageJ;
 import ij.ImagePlus;
 import ij.WindowManager;
+import ij.gui.GenericDialog;
 import ij.gui.Toolbar;
 import ij.process.LUT;
 
@@ -37,6 +38,7 @@ public class MontageTool extends AbstractTool
 	private ImagePlus imp;
 
 	private MontageFrame montageFrame; 
+	private GenericDialog gd;
 	
 	/** Tile size in pixels */
 	private static int TILE_SIZE = 20;
@@ -92,8 +94,43 @@ public class MontageTool extends AbstractTool
 		// Let's add our tool as focus listener
 		WindowManager.getCurrentWindow().addFocusListener(this);
 		
+		// Init options dialog
+		initOptionsDialog();
+		
 		// Launch interactive mode
 		super.run(arg);
+	}
+
+	private void initOptionsDialog() {
+		gd = new GenericDialog("Montage Options");
+		
+		// Time Stamp
+		// TODO Implement properly
+//		gd.addMessage("Time Stamp Settings");
+//		gd.addChoice("Position", new String[]{"Lower Right", "Lower Left"}, "Lower Right");
+		
+		// Event Stamp
+		// TODO Implement properly
+//		gd.addMessage("Event Stamp Settings");
+//		gd.addChoice("Position", new String[]{"Lower Right", "Lower Left"}, "Lower Right");
+		
+		// Scalebar
+		gd.addMessage("Scalebar Settings");
+		gd.addStringField("Font", "SansSerif");
+		gd.addNumericField("Font size", 42, 0);
+		gd.addNumericField("Width", 10, 1, 4, "[unit]");
+		gd.addNumericField("Height", 0.250, 3, 5, "[%]");
+		gd.addChoice("Position", new String[]{"Lower Right", "Lower Left"}, "Lower Right");
+		gd.addChoice("Color", new String[]{"White", "Black"}, "White");
+		
+		// ROI
+		gd.addMessage("ROI Settings");
+		gd.addChoice("Color", new String[]{"White", "Black"}, "White");
+		
+		// Padding
+		gd.addMessage("Padding");
+		gd.addNumericField("Width", 10, 0, 4, "[px]");
+		gd.addChoice("Color", new String[]{"White", "Black"}, "White");
 	}
 
 	@Override
@@ -154,8 +191,36 @@ public class MontageTool extends AbstractTool
 
 	@Override
 	public void showOptionDialog() {
-		// TODO Auto-generated method stub
+		gd.showDialog();
 		
+		if (!gd.wasCanceled()) {
+			parseOptionsFromDialog(gd);
+		}
+	}
+
+	/**
+	 * Parses options from a {@link GenericDialog}. Is not responsible for
+	 * setting options.
+	 * 
+	 * TODO Improve documentation
+	 * 
+	 * @param gd
+	 */
+	private void parseOptionsFromDialog(GenericDialog gd) {
+		// Scalebar
+		String fontName = gd.getNextString();
+		double fontSize = gd.getNextNumber();
+		double scalebarWidth = gd.getNextNumber();
+		double scalebarHeight = gd.getNextNumber();
+		String scalebarPosition = gd.getNextChoice();
+		String scalebarColor = gd.getNextChoice();
+		
+		// ROI
+		String roiColor = gd.getNextChoice();
+		
+		// Padding
+		Double paddingWidth = gd.getNextNumber();
+		String paddingColor = gd.getNextChoice();
 	}
 
 	/**
