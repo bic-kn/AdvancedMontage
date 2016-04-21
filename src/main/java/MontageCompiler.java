@@ -15,6 +15,8 @@ import ij.process.LUT;
 public class MontageCompiler implements Observer {
 
 	private ImagePlus inputImp;
+	private int maxColumns = -1;
+	private int maxRows = -1;
 	
 	public MontageCompiler(ImagePlus inputImp) {
 		this.inputImp = inputImp;
@@ -23,8 +25,8 @@ public class MontageCompiler implements Observer {
 	public ImagePlus compileMontage(MontagePanel panel) {
 		Component[] components = panel.getComponents();
 		
-		int columns = numberOfOutputColumns();
-		int rows = numberOfOutputRows();		
+		int columns = numberOfOutputColumns(panel);
+		int rows = numberOfOutputRows(panel);		
 		ImagePlus outputImp = new ImagePlus("Montage", new ByteProcessor(columns*inputImp.getWidth(), rows*inputImp.getHeight()));
 		
 		for (Component component : components) {
@@ -97,17 +99,44 @@ public class MontageCompiler implements Observer {
 	
 	private ImageProcessor extractChannelFromInput(ChannelOverlay overlay) {
 		ImageStack stack = inputImp.getStack();
-		
-		// TODO Return processor for overlay channel
 		return stack.getProcessor(overlay.getChannel());
 	}
 
-	int numberOfOutputColumns() {
-		return 2;
+	int numberOfOutputColumns(MontagePanel panel) {
+//		if (maxColumns > 0) {
+//			return maxColumns;
+//		}
+		
+		computeAndSetMaxColumnsAndRows(panel);
+		return maxColumns;
 	}
 	
-	int numberOfOutputRows() {
-		return 2;
+	int numberOfOutputRows(MontagePanel panel) {
+//		if (maxRows > 0) {
+//			return maxRows;
+//		}
+		
+		computeAndSetMaxColumnsAndRows(panel);
+		return maxRows;
+	}
+
+	private void computeAndSetMaxColumnsAndRows(MontagePanel panel) {
+		maxColumns = -1;
+		maxRows = -1;
+		
+		Component[] components = panel.getComponents();		
+		for (Component component : components) {
+			if (component instanceof MontageItem) {
+				MontageItem item = (MontageItem) component;
+				if (!item.isEmpty()) {
+					int itemColumn = item.getColumn()+1;
+					int itemRow = item.getRow()+1;
+					
+					maxColumns = itemColumn > maxColumns ? itemColumn : maxColumns;
+					maxRows = itemRow > maxRows ? itemRow : maxRows;
+				}
+			}
+		}
 	}
 
 	@Override
@@ -115,7 +144,7 @@ public class MontageCompiler implements Observer {
 		// FIXME Never actually called
 		compileMontage(null);
 	}
-
+	
 	/**
 	 * Adapted from {@link ScaleBar}.
 	 */

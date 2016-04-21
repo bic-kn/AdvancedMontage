@@ -320,4 +320,9 @@ class MontageItem extends JButton implements ActionListener, ItemListener {
 	public void setOverlays(List<MontageItemOverlay> overlays) {
 		this.overlays = overlays;
 	}
+	
+	public boolean isEmpty() {
+		return overlays.isEmpty();
+	}
+
 }
