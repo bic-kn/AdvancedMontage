@@ -10,8 +10,7 @@ import java.awt.Color;
 public class ScalebarOverlay extends MontageItemOverlay {
 
 	public ScalebarOverlay(Color color) {
-		super(color);
-		// TODO Auto-generated constructor stub
+		super(Color.DARK_GRAY);
 	}
 
 }

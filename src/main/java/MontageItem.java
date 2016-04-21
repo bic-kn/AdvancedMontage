@@ -42,7 +42,7 @@ class MontageItem extends JButton implements ActionListener, ItemListener {
 	public MontageItem(MontageTool tool) {
 		this.tool = tool;
 		
-		this.setBackground(new Color(59, 89, 182));
+		this.setBackground(new Color(242, 242, 242));
 		this.setContentAreaFilled(false);
 		this.setBorderPainted(true);
 		this.setBorder(new MontagePanelItemBorder());
@@ -108,18 +108,35 @@ class MontageItem extends JButton implements ActionListener, ItemListener {
 		// TODO Auto-generated method stub
 		super.paintComponent(g);
 
+		g.setColor(new Color(217, 217, 217));
+		g.fillRect(3, 3, getWidth()-6, getHeight()-6);
+		
 		// TODO Move to a central location
 		int overlayHeight = 5;
 		int overlayElementCount = 0;
 
 		// Draw rectangles on the button in the order of overlays
 		for (MontageItemOverlay overlayItem : overlays) {
-			g.setColor(overlayItem.getColor());
-			g.fillRect(overlayHeight,
-					overlayElementCount * overlayHeight
-							+ (overlayElementCount + 1) * overlayHeight,
-					this.getWidth() - 2 * overlayHeight, overlayHeight);
-			overlayElementCount++;
+			if (overlayItem instanceof ChannelOverlay) {
+				g.setColor(overlayItem.getColor());
+				g.fillRect(overlayHeight,
+						overlayElementCount * overlayHeight
+								+ (overlayElementCount + 1) * overlayHeight,
+						this.getWidth() - 2 * overlayHeight, overlayHeight);
+				overlayElementCount++;
+			}
+			
+			if (overlayItem instanceof RoiOverlay) {
+				g.setColor(overlayItem.getColor());
+				// TODO Improve computation of position
+				g.drawString("R", 2, this.getHeight() - 2);
+			}
+			
+			if (overlayItem instanceof ScalebarOverlay) {
+				g.setColor(overlayItem.getColor());
+				// TODO Improve computation of position
+				g.drawString("S", this.getWidth()-10, this.getHeight() - 2);
+			}
 		}
 	}
 
@@ -174,7 +191,7 @@ class MontageItem extends JButton implements ActionListener, ItemListener {
 		@Override
 		public void paintBorder(Component c, Graphics g, int x, int y,
 				int width, int height) {
-			g.setColor(new Color(59, 89, 182));
+			g.setColor(Color.BLACK);
 			g.drawRect(x, y, width - 1, height - 1);
 		}
 	}

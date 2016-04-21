@@ -81,6 +81,18 @@ public class MontageCompiler implements Observer {
 		overlay.add(flattenedImpRoi);
 		
 		// TODO Add scalebar and ROIs
+		for (MontageItemOverlay blubb : item.getOverlays()) {
+			if (blubb instanceof RoiOverlay) {
+				// TODO Do something
+//				overlay.add(roi);
+			} else if (blubb instanceof ScalebarOverlay) {
+				// TODO Do something
+//				overlay.add(scalebarRoi);
+			}
+		}
+		
+		
+		
 	}
 	
 	private ImageProcessor extractChannelFromInput(ChannelOverlay overlay) {
