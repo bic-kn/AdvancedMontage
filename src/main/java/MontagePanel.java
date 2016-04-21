@@ -2,6 +2,8 @@
 
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JPanel;
 
@@ -35,12 +37,28 @@ public class MontagePanel extends JPanel {
 	private void placeComponents() {
 		this.setLayout(new GridLayout(ROWS,COLUMNS));
 
+		int numberOfChannels = tool.getImp().getNChannels();
+		
 		// TODO Set the defaults
 		ComponentMover cm = new ComponentMover();
 		for (int i=0; i<ROWS*COLUMNS; i++) {
-			MontageItem item = new MontageItem(tool);
-			this.add(item);
+			MontageItem item;
+			if (i < numberOfChannels) {
+				MontageItemOverlay defaultChannelOverlay = MontageUtil.getOverlayForChannel(tool.getImp(), i+1);
+				List<MontageItemOverlay> defaultOverlays = new ArrayList<>();
+				defaultOverlays.add(defaultChannelOverlay);
+				item = new MontageItem(tool, defaultOverlays);
+			} else if (i == numberOfChannels) {
+				List<MontageItemOverlay> defaultOverlays = new ArrayList<>();
+				for (int channels = 1; channels <= numberOfChannels; channels++) {
+					defaultOverlays.add(MontageUtil.getOverlayForChannel(tool.getImp(), channels));				
+				}
+				item = new MontageItem(tool, defaultOverlays);
+			} else {
+				item = new MontageItem(tool);
+			}
 			
+			this.add(item);
 			cm.registerComponent(item);
 		}
 		

@@ -39,6 +39,12 @@ class MontageItem extends JButton implements ActionListener, ItemListener {
 	/** TODO */
 	private boolean drawRois = false;
 	
+	public MontageItem(MontageTool tool, List<MontageItemOverlay> overlays) {
+		this(tool);
+		
+		this.overlays.addAll(overlays);
+	}
+	
 	public MontageItem(MontageTool tool) {
 		this.tool = tool;
 		
