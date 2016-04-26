@@ -59,11 +59,11 @@ public class MontagePanel extends JPanel {
 			}
 			
 			this.add(item);
-			cm.registerComponent(item);
+//			cm.registerComponent(item);
 		}
 		
 	    // TODO Set correct snap size
-	    cm.setSnapSize(new Dimension(40, 40));
+//	    cm.setSnapSize(new Dimension(40, 40));
 	}
 	
 }
