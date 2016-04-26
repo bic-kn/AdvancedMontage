@@ -40,6 +40,21 @@ public class MontageTool extends AbstractTool
 	private MontageFrame montageFrame; 
 	private GenericDialog gd;
 	
+	// Scalebar
+	String fontName;
+	double fontSize;
+	double scalebarWidth;
+	double scalebarHeight;
+	String scalebarPosition;
+	Color scalebarColor;
+	
+	// ROI
+	String roiColor;
+	
+	// Padding
+	int paddingWidth;
+	Color paddingColor;
+	
 	/** Tile size in pixels */
 	private static int TILE_SIZE = 20;
 	
@@ -207,20 +222,24 @@ public class MontageTool extends AbstractTool
 	 * @param gd
 	 */
 	private void parseOptionsFromDialog(GenericDialog gd) {
+		// TODO Time Stamp
+		
+		// TODO Event Stamp
+		
 		// Scalebar
-		String fontName = gd.getNextString();
-		double fontSize = gd.getNextNumber();
-		double scalebarWidth = gd.getNextNumber();
-		double scalebarHeight = gd.getNextNumber();
-		String scalebarPosition = gd.getNextChoice();
-		String scalebarColor = gd.getNextChoice();
+		fontName = gd.getNextString();
+		fontSize = gd.getNextNumber();
+		scalebarWidth = gd.getNextNumber();
+		scalebarHeight = gd.getNextNumber();
+		scalebarPosition = gd.getNextChoice();	
+		scalebarColor = Color.getColor(gd.getNextChoice(), Color.WHITE);
 		
 		// ROI
-		String roiColor = gd.getNextChoice();
+		roiColor = gd.getNextChoice();
 		
 		// Padding
-		Double paddingWidth = gd.getNextNumber();
-		String paddingColor = gd.getNextChoice();
+		paddingWidth = (int) Math.floor(gd.getNextNumber());
+		paddingColor = Color.getColor(gd.getNextChoice(), Color.WHITE);
 	}
 
 	/**
@@ -242,7 +261,7 @@ public class MontageTool extends AbstractTool
 		new ImageJ();
 
 		// open the Clown sample
-		ImagePlus image = IJ.openImage("/Users/stefan/Dropbox/Konstanz/ImageJ Workshop 2016/2016/Examples/01/VH7.tif");
+		ImagePlus image = IJ.openImage("/home/stefan/Dropbox/Konstanz/ImageJ Workshop 2016/2016/Examples/01/VH7.tif");
 		image.show();
 
 		// run the plugin
@@ -255,4 +274,20 @@ public class MontageTool extends AbstractTool
 	public ImagePlus getImp() {
 		return imp;
 	}
+
+	/**
+	 * @return the padding width
+	 */
+	public int getPaddingWidth() {
+		return paddingWidth;
+	}
+
+	/**
+	 * @return the padding color
+	 */
+	public Color getPaddingColor() {
+		// TODO Add correct implementation
+		return Color.WHITE;
+	}
+
 }

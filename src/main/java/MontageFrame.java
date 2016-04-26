@@ -40,7 +40,7 @@ public class MontageFrame extends JFrame implements ActionListener {
 		frame.setTitle("Montage");
 		frame.setVisible(true);
 		
-		compiler = new MontageCompiler(montageTool.getImp());
+		compiler = new MontageCompiler(montageTool.getImp(), montageTool);
 	}
 
 	@Override

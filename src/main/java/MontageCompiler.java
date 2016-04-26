@@ -30,22 +30,32 @@ public class MontageCompiler implements Observer {
 	private boolean hideText = false;
 	static final String[] locations = {"Upper Right", "Lower Right", "Lower Left", "Upper Left", "At Selection"};
 	static final int UPPER_RIGHT=0, LOWER_RIGHT=1, LOWER_LEFT=2, UPPER_LEFT=3, AT_SELECTION=4;
+	private MontageTool tool;
 	
-	public MontageCompiler(ImagePlus inputImp) {
+	public MontageCompiler(ImagePlus inputImp, MontageTool tool) {
 		this.inputImp = inputImp;
+		this.tool = tool;
 	}
-
+	
+	/**
+	 * TODO Documentation
+	 * 
+	 * @param panel
+	 * @return
+	 */
 	public ImagePlus compileMontage(MontagePanel panel) {
 		Component[] components = panel.getComponents();
 		
 		int columns = numberOfOutputColumns(panel);
 		int rows = numberOfOutputRows(panel);
 		
-		// TODO Integrate padding
-		int outputWidth = computeOutputWidth(columns, 0); //, paddingWidth);
-		int outputHeight = computeOutputHeight(rows, 0); //, paddingWidth);
+		int outputWidth = computeOutputWidth(columns, tool.getPaddingWidth());
+		int outputHeight = computeOutputHeight(rows, tool.getPaddingWidth());
 		
-		ImagePlus outputImp = new ImagePlus("Montage", new ByteProcessor(outputWidth, outputHeight));
+		ImageProcessor outputIp = new ByteProcessor(outputWidth, outputHeight);
+		outputIp.setColor(tool.getPaddingColor());
+		outputIp.fill();
+		ImagePlus outputImp = new ImagePlus("Montage", outputIp);
 		
 		for (Component component : components) {
 			if (component instanceof MontageItem) {
@@ -66,7 +76,14 @@ public class MontageCompiler implements Observer {
 		return rows*inputImp.getHeight() + (rows-1)*paddingWidth;
 	}
 
-	void compileItem(MontageItem item, ImagePlus outputImp) {
+	/**
+	 * Compiles an image from a {@link MontageItem} and adds it to the overlay
+	 * of outputImp.
+	 * 
+	 * @param item
+	 * @param outputImp
+	 */
+	private void compileItem(MontageItem item, ImagePlus outputImp) {
 		int inputWidth = inputImp.getWidth();
 		int inputHeight = inputImp.getHeight();
 		
@@ -99,7 +116,9 @@ public class MontageCompiler implements Observer {
 			flattenedImp.show();
 		}
 		
-		ImageRoi flattenedImpRoi = new ImageRoi(item.getColumn()*inputWidth, item.getRow()*inputHeight, flattenedImp.getProcessor());
+		ImageRoi flattenedImpRoi = new ImageRoi(
+				item.getColumn() * inputWidth + item.getColumn() * tool.paddingWidth,
+				item.getRow() * inputHeight + item.getRow() * tool.paddingWidth, flattenedImp.getProcessor());
 		
 		Overlay overlay = outputImp.getOverlay();
 		if (overlay == null) {
@@ -135,6 +154,8 @@ public class MontageCompiler implements Observer {
 	}
 
 	int numberOfOutputColumns(MontagePanel panel) {
+		// TODO Implement check for change in panel and return values if no
+		// change was observed
 //		if (maxColumns > 0) {
 //			return maxColumns;
 //		}
@@ -144,6 +165,8 @@ public class MontageCompiler implements Observer {
 	}
 	
 	int numberOfOutputRows(MontagePanel panel) {
+		// TODO Implement check for change in panel and return values if no
+		// change was observed
 //		if (maxRows > 0) {
 //			return maxRows;
 //		}
