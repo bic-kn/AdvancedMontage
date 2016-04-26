@@ -3,12 +3,11 @@
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Collection;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 
-import ij.ImagePlus;
 import ij.process.LUT;
 
 /**
@@ -18,37 +17,46 @@ import ij.process.LUT;
  */
 public class MontageFrame extends JFrame implements ActionListener {      
 	
-	JFrame frame;
-	JPanel DrawPanel;
-	JButton button;
+	MontagePanel panel;
+	JButton compileButton;
 	
-	private MontagePanel panel;
-	private MontageCompiler compiler;
-	private MontageTool montageTool;
+	private Collection<ActionListener> actionListeners;
 	
 	public MontageFrame(LUT[] luts, MontageTool montageTool) {
-		frame = new JFrame();
-		button = new JButton("Compile montage");
-		button.addActionListener(this);
+		super();
 		
 		panel = new MontagePanel(luts, montageTool);
+		getContentPane().add(BorderLayout.CENTER, panel);
 		
-		frame.getContentPane().add(BorderLayout.SOUTH, button);
-		frame.getContentPane().add(BorderLayout.CENTER, panel);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE );
-		frame.setSize(200,200);
-		frame.setTitle("Montage");
-		frame.setVisible(true);
+		compileButton = new JButton("Compile montage");
+		compileButton.addActionListener(this);
+		getContentPane().add(BorderLayout.SOUTH, compileButton);
 		
-		compiler = new MontageCompiler(montageTool.getImp(), montageTool);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE );
+		setSize(200,200);
+		setTitle("Montage");
+		setVisible(true);
+	}
+	
+	/**
+	 * TODO Documentation
+	 * 
+	 * @param actionListener
+	 */
+	public void addActionListener(ActionListener actionListener) {
+		actionListeners.add(actionListener);
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent event) {
-		// TODO New thread for montage creation
-		ImagePlus montage = compiler.compileMontage(panel);
-		
-		montage.show();
+		actionListeners.forEach(l -> l.actionPerformed(event));
+	}
+
+	/**
+	 * @return the panel
+	 */
+	public MontagePanel getPanel() {
+		return panel;
 	}
 	
 }

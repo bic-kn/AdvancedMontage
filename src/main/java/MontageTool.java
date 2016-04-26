@@ -1,6 +1,7 @@
 // TODO Insert license header
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
@@ -8,11 +9,12 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.util.Collection;
+import java.util.LinkedList;
 
 import fiji.tool.AbstractTool;
 import fiji.tool.ToolToggleListener;
 import fiji.tool.ToolWithOptions;
-import ij.CompositeImage;
 import ij.IJ;
 import ij.ImageJ;
 import ij.ImagePlus;
@@ -159,7 +161,9 @@ public class MontageTool extends AbstractTool
 		// Get active LUTs
 		LUT[] luts = imp.getLuts();
 		
+		MontageCompiler compiler = new MontageCompiler(this);
 		montageFrame = new MontageFrame(luts, this);
+		montageFrame.addActionListener(compiler);
 	}
 
 	@Override
@@ -290,4 +294,17 @@ public class MontageTool extends AbstractTool
 		return Color.WHITE;
 	}
 
+	public Collection<MontageItem> getMontageItems() {
+		Component[] components = montageFrame.getPanel().getComponents();
+		Collection<MontageItem> montageItems = new LinkedList<>();
+		
+		for (Component component : components) {
+			if (component instanceof MontageItem) {
+				montageItems.add((MontageItem) component);
+			}
+		}
+		
+		return montageItems;
+	}
+	
 }

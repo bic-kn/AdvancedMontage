@@ -1,9 +1,9 @@
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Font;
 import java.awt.Point;
-import java.util.Observable;
-import java.util.Observer;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Collection;
 
 import ij.CompositeImage;
 import ij.IJ;
@@ -20,9 +20,8 @@ import ij.process.ByteProcessor;
 import ij.process.ImageProcessor;
 import ij.process.LUT;
 
-public class MontageCompiler implements Observer {
+public class MontageCompiler implements ActionListener {
 
-	private ImagePlus inputImp;
 	private int maxColumns = -1;
 	private int maxRows = -1;
 	private boolean boldText;
@@ -32,8 +31,7 @@ public class MontageCompiler implements Observer {
 	static final int UPPER_RIGHT=0, LOWER_RIGHT=1, LOWER_LEFT=2, UPPER_LEFT=3, AT_SELECTION=4;
 	private MontageTool tool;
 	
-	public MontageCompiler(ImagePlus inputImp, MontageTool tool) {
-		this.inputImp = inputImp;
+	public MontageCompiler(MontageTool tool) {
 		this.tool = tool;
 	}
 	
@@ -43,11 +41,11 @@ public class MontageCompiler implements Observer {
 	 * @param panel
 	 * @return
 	 */
-	public ImagePlus compileMontage(MontagePanel panel) {
-		Component[] components = panel.getComponents();
+	public ImagePlus compileMontage() {	
+		Collection<MontageItem> montageItems = tool.getMontageItems();
 		
-		int columns = numberOfOutputColumns(panel);
-		int rows = numberOfOutputRows(panel);
+		int columns = numberOfOutputColumns(montageItems);
+		int rows = numberOfOutputRows(montageItems);
 		
 		int outputWidth = computeOutputWidth(columns, tool.getPaddingWidth());
 		int outputHeight = computeOutputHeight(rows, tool.getPaddingWidth());
@@ -57,23 +55,20 @@ public class MontageCompiler implements Observer {
 		outputIp.fill();
 		ImagePlus outputImp = new ImagePlus("Montage", outputIp);
 		
-		for (Component component : components) {
-			if (component instanceof MontageItem) {
-				MontageItem item = (MontageItem) component;
-				
-				compileItem(item, outputImp);
-			}
+		
+		for (MontageItem montageItem : montageItems) {
+			compileItem(montageItem, outputImp);
 		}
 		
 		return outputImp;
 	}
 
 	private int computeOutputWidth(int columns, int paddingWidth) {
-		return columns*inputImp.getWidth() + (columns-1)*paddingWidth;
+		return columns*tool.getImp().getWidth() + (columns-1)*paddingWidth;
 	}
 	
 	private int computeOutputHeight(int rows, int paddingWidth) {
-		return rows*inputImp.getHeight() + (rows-1)*paddingWidth;
+		return rows*tool.getImp().getHeight() + (rows-1)*paddingWidth;
 	}
 
 	/**
@@ -84,14 +79,14 @@ public class MontageCompiler implements Observer {
 	 * @param outputImp
 	 */
 	private void compileItem(MontageItem item, ImagePlus outputImp) {
-		int inputWidth = inputImp.getWidth();
-		int inputHeight = inputImp.getHeight();
+		int inputWidth = tool.getImp().getWidth();
+		int inputHeight = tool.getImp().getHeight();
 		
 		if (item.getOverlays().isEmpty()) {
 			return;
 		}
 		
-		LUT[] luts = inputImp.getLuts();
+		LUT[] luts = tool.getImp().getLuts();
 		
 		// Create composite from ChannelOverlays
 		ImageStack stack = new ImageStack(inputWidth, inputHeight);
@@ -117,8 +112,8 @@ public class MontageCompiler implements Observer {
 		}
 		
 		ImageRoi flattenedImpRoi = new ImageRoi(
-				item.getColumn() * inputWidth + item.getColumn() * tool.paddingWidth,
-				item.getRow() * inputHeight + item.getRow() * tool.paddingWidth, flattenedImp.getProcessor());
+				item.getColumn() * inputWidth + item.getColumn() * tool.getPaddingWidth(),
+				item.getRow() * inputHeight + item.getRow() * tool.getPaddingWidth(), flattenedImp.getProcessor());
 		
 		Overlay overlay = outputImp.getOverlay();
 		if (overlay == null) {
@@ -149,57 +144,48 @@ public class MontageCompiler implements Observer {
 	}
 
 	private ImageProcessor extractChannelFromInput(ChannelOverlay overlay) {
-		ImageStack stack = inputImp.getStack();
+		ImageStack stack = tool.getImp().getStack();
 		return stack.getProcessor(overlay.getChannel());
 	}
 
-	int numberOfOutputColumns(MontagePanel panel) {
+	int numberOfOutputColumns(Collection<MontageItem> montageItems) {
 		// TODO Implement check for change in panel and return values if no
 		// change was observed
 //		if (maxColumns > 0) {
 //			return maxColumns;
 //		}
 		
-		computeAndSetMaxColumnsAndRows(panel);
+		computeAndSetMaxColumnsAndRows(montageItems);
 		return maxColumns;
 	}
 	
-	int numberOfOutputRows(MontagePanel panel) {
+	int numberOfOutputRows(Collection<MontageItem> montageItems) {
 		// TODO Implement check for change in panel and return values if no
 		// change was observed
 //		if (maxRows > 0) {
 //			return maxRows;
 //		}
 		
-		computeAndSetMaxColumnsAndRows(panel);
+		computeAndSetMaxColumnsAndRows(montageItems);
 		return maxRows;
 	}
 
-	private void computeAndSetMaxColumnsAndRows(MontagePanel panel) {
+	private void computeAndSetMaxColumnsAndRows(Collection<MontageItem> montageItems) {
+		// Reset before each iteration
 		maxColumns = -1;
 		maxRows = -1;
 		
-		Component[] components = panel.getComponents();		
-		for (Component component : components) {
-			if (component instanceof MontageItem) {
-				MontageItem item = (MontageItem) component;
-				if (!item.isEmpty()) {
-					int itemColumn = item.getColumn()+1;
-					int itemRow = item.getRow()+1;
-					
-					maxColumns = itemColumn > maxColumns ? itemColumn : maxColumns;
-					maxRows = itemRow > maxRows ? itemRow : maxRows;
-				}
+		for (MontageItem item : montageItems) {
+			if (!item.isEmpty()) {
+				int itemColumn = item.getColumn()+1;
+				int itemRow = item.getRow()+1;
+				
+				maxColumns = itemColumn > maxColumns ? itemColumn : maxColumns;
+				maxRows = itemRow > maxRows ? itemRow : maxRows;
 			}
 		}
 	}
 
-	@Override
-	public void update(Observable o, Object arg) {
-		// FIXME Never actually called
-		compileMontage(null);
-	}
-	
 	/**
 	 * Adapted from {@link ScaleBar}.
 	 */
@@ -219,11 +205,11 @@ public class MontageCompiler implements Observer {
 		// TODO Get from global settings
 		int paddingWidth = 10;
 		
-		Calibration cal = inputImp.getCalibration();
+		Calibration cal = tool.getImp().getCalibration();
 		int barWidthInPixels = (int)(barWidth/cal.pixelWidth);
 		
-		int width = inputImp.getWidth();
-		int height = inputImp.getHeight();
+		int width = tool.getImp().getWidth();
+		int height = tool.getImp().getHeight();
 		int fraction = 20;
 		int x = width - width/fraction - barWidthInPixels;
 		int y = 0;
@@ -240,8 +226,8 @@ public class MontageCompiler implements Observer {
 			y = height - height/fraction - barHeightInPixels - fontSize;
 		}
 		
-		int xShift = item.getColumn()*inputImp.getWidth() + item.getColumn()*paddingWidth;
-		int yShift = item.getRow()*inputImp.getHeight() + item.getRow()*paddingWidth;
+		int xShift = item.getColumn()*tool.getImp().getWidth() + item.getColumn()*paddingWidth;
+		int yShift = item.getRow()*tool.getImp().getHeight() + item.getRow()*paddingWidth;
 		
 		return new Point(xShift + x, yShift + y);
 	}
@@ -278,11 +264,11 @@ public class MontageCompiler implements Observer {
 		int fontType = boldText?Font.BOLD:Font.PLAIN;
 		String face = serifFont?"Serif":"SanSerif";
 		Font font = new Font(face, fontType, fontSize);
-		String label = getLength(barWidth) + " "+ getUnits(inputImp);
-		ImageProcessor ip = inputImp.getProcessor();
+		String label = getLength(barWidth) + " "+ getUnits(tool.getImp());
+		ImageProcessor ip = tool.getImp().getProcessor();
 		ip.setFont(font);
 		int textWidth = hideText?0:ip.getStringWidth(label);
-		Calibration cal = inputImp.getCalibration();
+		Calibration cal = tool.getImp().getCalibration();
 		int barWidthInPixels = (int)(barWidth/cal.pixelWidth);
 		Roi bar = new Roi(x, y, barWidthInPixels, barHeightInPixels);
 		bar.setFillColor(color);
@@ -314,4 +300,12 @@ public class MontageCompiler implements Observer {
 		}
 		return IJ.d2s(barWidth, digits);
 	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		ImagePlus montage = compileMontage();
+		
+		montage.show();
+	}
+
 }
