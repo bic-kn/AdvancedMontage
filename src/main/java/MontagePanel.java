@@ -1,13 +1,10 @@
 // TODO Missing license header
 
-import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JPanel;
-
-import ij.process.LUT;
 
 /**
  * TODO Documentation
@@ -16,13 +13,11 @@ import ij.process.LUT;
  */
 public class MontagePanel extends JPanel {
 
-	protected LUT[] luts;
 	private final static int ROWS = 4;
 	private final static int COLUMNS = 4;
 	private MontageTool tool;
 	
-	public MontagePanel(LUT[] luts, MontageTool tool) {
-		this.luts = luts;
+	public MontagePanel(MontageTool tool) {
 		this.tool = tool;
 		
 		placeComponents();

@@ -8,14 +8,10 @@ import ij.process.LUT;
 
 class MontageItemPopup extends PopupMenu {
 
-	/** TODO */
-	private final MontagePanel montagePanel;
-
-	/**
-	 * @param montagePanel
-	 */
-	MontageItemPopup(MontagePanel montagePanel) {
-		this.montagePanel = montagePanel;
+	private MontageTool tool;
+	
+	public MontageItemPopup(MontageTool tool) {
+		this.tool = tool;
 		
 		// FIXME Call init()
 	}
@@ -38,7 +34,7 @@ class MontageItemPopup extends PopupMenu {
 		// For all available channels in the image
 		channelItems = new ArrayList<>();
 		int i = 1;
-		for (LUT lut : this.montagePanel.luts) {
+		for (LUT lut : tool.getAvailableLuts()) {
 			// TODO Check if an overlay exists for that LUT
 			CheckboxMenuItem channelItem = new CheckboxMenuItem(MontageUtil.getLUTName(lut),
 					item.overlaysContain(lut) ? true : false);

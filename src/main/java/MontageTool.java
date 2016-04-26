@@ -158,11 +158,8 @@ public class MontageTool extends AbstractTool
 			// TODO Handle activation without open image
 		}
 		
-		// Get active LUTs
-		LUT[] luts = imp.getLuts();
-		
 		MontageCompiler compiler = new MontageCompiler(this);
-		montageFrame = new MontageFrame(luts, this);
+		montageFrame = new MontageFrame(this);
 		montageFrame.addActionListener(compiler);
 	}
 
@@ -306,5 +303,8 @@ public class MontageTool extends AbstractTool
 		
 		return montageItems;
 	}
-	
+
+	public LUT[] getAvailableLuts() {
+		return getImp().getLuts();
+	}
 }

@@ -90,7 +90,7 @@ class MontageItem extends JButton implements ActionListener, ItemListener {
 
 			private void doPop(MouseEvent e) {
 				if (menu == null) {
-					menu = new MontageItemPopup((MontagePanel) getParent());
+					menu = new MontageItemPopup(tool);
 					add(menu);
 					menu.init();
 				}

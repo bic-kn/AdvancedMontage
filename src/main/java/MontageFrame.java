@@ -8,8 +8,6 @@ import java.util.Collection;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 
-import ij.process.LUT;
-
 /**
  * TODO Documentation
  * 
@@ -22,10 +20,10 @@ public class MontageFrame extends JFrame implements ActionListener {
 	
 	private Collection<ActionListener> actionListeners;
 	
-	public MontageFrame(LUT[] luts, MontageTool montageTool) {
+	public MontageFrame(MontageTool montageTool) {
 		super();
 		
-		panel = new MontagePanel(luts, montageTool);
+		panel = new MontagePanel(montageTool);
 		getContentPane().add(BorderLayout.CENTER, panel);
 		
 		compileButton = new JButton("Compile montage");
