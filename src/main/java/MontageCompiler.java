@@ -14,6 +14,7 @@ import ij.gui.Overlay;
 import ij.gui.Roi;
 import ij.gui.TextRoi;
 import ij.measure.Calibration;
+import ij.plugin.HyperStackConverter;
 import ij.plugin.ScaleBar;
 import ij.plugin.frame.RoiManager;
 import ij.process.ByteProcessor;
@@ -91,7 +92,7 @@ public class MontageCompiler implements ActionListener {
 		// Create composite from ChannelOverlays
 		ImageStack stack = new ImageStack(inputWidth, inputHeight);
 		for (MontageItemOverlay overlay : item.getOverlays()) {
-			if (overlay instanceof ChannelOverlay) {
+			if (overlay instanceof ChannelOverlay && overlay.isDrawn()) {
 				ImageProcessor channelImageProcessor = extractChannelFromInput((ChannelOverlay) overlay);
 				channelImageProcessor.setLut(luts[((ChannelOverlay) overlay).getChannel()-1]);
 				stack.addSlice(channelImageProcessor);
@@ -101,8 +102,7 @@ public class MontageCompiler implements ActionListener {
 		if (IJ.debugMode) {
 			tempImp.show();
 		}
-		CompositeImage compositeImage = new CompositeImage(tempImp);
-		compositeImage.setMode(CompositeImage.COMPOSITE);
+		CompositeImage compositeImage = new CompositeImage(tempImp, CompositeImage.COMPOSITE);
 		if (IJ.debugMode) {
 			compositeImage.show();
 		}
@@ -123,9 +123,9 @@ public class MontageCompiler implements ActionListener {
 		overlay.add(flattenedImpRoi);
 		
 		for (MontageItemOverlay itemOverlay : item.getOverlays()) {
-			if (itemOverlay instanceof RoiOverlay) {
+			if (itemOverlay instanceof RoiOverlay && itemOverlay.isDrawn()) {
 				addROIsToOverlay(overlay);
-			} else if (itemOverlay instanceof ScalebarOverlay) {
+			} else if (itemOverlay instanceof ScalebarOverlay && itemOverlay.isDrawn()) {
 				addScalebarToOverlay(item, overlay);
 			}
 		}
