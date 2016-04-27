@@ -17,6 +17,7 @@ public class MontagePanel extends JPanel {
 	private final static int ROWS = 4;
 	private final static int COLUMNS = 4;
 	private MontageTool tool;
+	ComponentMover cm;
 	
 	public MontagePanel(MontageTool tool) {
 		this.tool = tool;
@@ -35,8 +36,7 @@ public class MontagePanel extends JPanel {
 
 		int numberOfChannels = tool.getImp().getNChannels();
 		
-		// TODO Set the defaults
-		ComponentMover cm = new ComponentMover();
+		cm = new ComponentMover();
 		for (int i=0; i<ROWS*COLUMNS; i++) {
 			List<MontageItemOverlay> defaultOverlays = new ArrayList<>();
 			
@@ -69,9 +69,9 @@ public class MontagePanel extends JPanel {
 			this.add(item);
 			cm.registerComponent(item);
 		}
-		
-	    // TODO Set correct snap size
-	    cm.setSnapSize(new Dimension(50, 35));
 	}
-	
+
+	public void setSnapSize() {
+		cm.setSnapSize(new Dimension(getComponents()[0].getWidth(), getComponents()[0].getHeight()));
+	}
 }

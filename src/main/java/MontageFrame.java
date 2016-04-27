@@ -37,6 +37,8 @@ public class MontageFrame extends JFrame implements ActionListener {
 		setSize(200,200);
 		setTitle("Montage");
 		setVisible(true);
+		
+		panel.setSnapSize();
 	}
 	
 	/**
