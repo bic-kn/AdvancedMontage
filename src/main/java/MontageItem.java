@@ -350,8 +350,13 @@ class MontageItem extends JButton implements ActionListener, ItemListener {
 		this.overlays = overlays;
 	}
 	
+	/**
+	 * TODO Documentation
+	 * 
+	 * @return
+	 */
 	public boolean isEmpty() {
-		return overlays.isEmpty();
+		return overlays.stream().noneMatch(o -> o.isDrawn());
 	}
 
 	/**
