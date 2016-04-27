@@ -86,7 +86,7 @@ public class MontageCompiler implements ActionListener {
 			return;
 		}
 		
-		LUT[] luts = tool.getImp().getLuts();
+		LUT[] luts = tool.getAvailableLuts();
 		
 		// Create composite from ChannelOverlays
 		ImageStack stack = new ImageStack(inputWidth, inputHeight);

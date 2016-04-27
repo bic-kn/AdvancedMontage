@@ -9,7 +9,7 @@ import java.awt.Color;
  */
 public class ScalebarOverlay extends MontageItemOverlay {
 
-	public ScalebarOverlay(Color color) {
+	public ScalebarOverlay() {
 		super(Color.DARK_GRAY);
 	}
 

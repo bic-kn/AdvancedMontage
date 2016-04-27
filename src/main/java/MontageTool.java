@@ -10,11 +10,14 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 import fiji.tool.AbstractTool;
 import fiji.tool.ToolToggleListener;
 import fiji.tool.ToolWithOptions;
+import ij.CompositeImage;
 import ij.IJ;
 import ij.ImageJ;
 import ij.ImagePlus;
@@ -306,5 +309,36 @@ public class MontageTool extends AbstractTool
 
 	public LUT[] getAvailableLuts() {
 		return getImp().getLuts();
+	}
+	
+	/** Compute channel/color mapping only once. */
+	private Map<Integer, Color> channelToColor = new HashMap<>();
+	
+	/**
+	 * TODO Documentation
+	 * 
+	 * @param channel
+	 * @return
+	 */
+	public Color getColorForChannel(final int channel) {
+		if (channelToColor.get(channel) != null) {
+			return channelToColor.get(channel);
+		}
+		
+		if (getImp().isComposite()) {
+			CompositeImage ci = (CompositeImage) imp;
+			ci.setC(channel);
+			if (ci.getMode() == IJ.COMPOSITE) {
+				Color c = ci.getChannelColor();
+				if (Color.green.equals(c)) {
+					c = new Color(0,180,0);
+				}
+				
+				channelToColor.put(channel, c);
+				return c;
+			}
+		}
+		
+		return Color.WHITE;
 	}
 }

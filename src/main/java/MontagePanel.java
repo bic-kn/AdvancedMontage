@@ -35,21 +35,36 @@ public class MontagePanel extends JPanel {
 		int numberOfChannels = tool.getImp().getNChannels();
 		
 		// TODO Set the defaults
-		ComponentMover cm = new ComponentMover();
+//		ComponentMover cm = new ComponentMover();
 		for (int i=0; i<ROWS*COLUMNS; i++) {
-			MontageItem item;
-			if (i < numberOfChannels) {
-				MontageItemOverlay defaultChannelOverlay = MontageUtil.getOverlayForChannel(tool.getImp(), i+1);
-				List<MontageItemOverlay> defaultOverlays = new ArrayList<>();
+			List<MontageItemOverlay> defaultOverlays = new ArrayList<>();
+			
+			// Add channels
+			for (int c = 0; c < tool.getImp().getNChannels(); c++) {
+				ChannelOverlay defaultChannelOverlay = new ChannelOverlay(tool.getColorForChannel(c+1), c+1);
 				defaultOverlays.add(defaultChannelOverlay);
-				item = new MontageItem(tool, defaultOverlays);
+			}
+			
+			// Add ROI
+			RoiOverlay roiOverlay = new RoiOverlay();
+			defaultOverlays.add(roiOverlay);
+			
+			// Add scalebar
+			ScalebarOverlay scaleOverlay = new ScalebarOverlay();
+			defaultOverlays.add(scaleOverlay);
+			
+			MontageItem item = new MontageItem(tool, defaultOverlays);
+
+			if (i < numberOfChannels) {
+				// Only one channel at the position
+				defaultOverlays.get(i).setDrawn(true);
 			} else if (i == numberOfChannels) {
-				List<MontageItemOverlay> defaultOverlays = new ArrayList<>();
-				for (int channels = 1; channels <= numberOfChannels; channels++) {
-					defaultOverlays.add(MontageUtil.getOverlayForChannel(tool.getImp(), channels));				
+				// Composite
+				for (int j=0; j<numberOfChannels; j++) {
+					defaultOverlays.get(j).setDrawn(true);
 				}
-				item = new MontageItem(tool, defaultOverlays);
 			} else {
+				// No overlay
 				item = new MontageItem(tool);
 			}
 			

@@ -9,7 +9,7 @@ import java.awt.Color;
  */
 public class RoiOverlay extends MontageItemOverlay {
 
-	public RoiOverlay(Color color) {
+	public RoiOverlay() {
 		super(Color.DARK_GRAY);
 	}
 

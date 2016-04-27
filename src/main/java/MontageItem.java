@@ -33,12 +33,6 @@ class MontageItem extends JButton implements ActionListener, ItemListener {
 	private MontageItemPopup menu;
 	private MontageTool tool;
 	
-	/** TODO */
-	private boolean drawOverlay = false;
-	
-	/** TODO */
-	private boolean drawRois = false;
-	
 	public MontageItem(MontageTool tool, List<MontageItemOverlay> overlays) {
 		this(tool);
 		
@@ -123,7 +117,7 @@ class MontageItem extends JButton implements ActionListener, ItemListener {
 
 		// Draw rectangles on the button in the order of overlays
 		for (MontageItemOverlay overlayItem : overlays) {
-			if (overlayItem instanceof ChannelOverlay) {
+			if (overlayItem instanceof ChannelOverlay && overlayItem.isDrawn()) {
 				g.setColor(overlayItem.getColor());
 				g.fillRect(overlayHeight,
 						overlayElementCount * overlayHeight
@@ -132,13 +126,13 @@ class MontageItem extends JButton implements ActionListener, ItemListener {
 				overlayElementCount++;
 			}
 			
-			if (overlayItem instanceof RoiOverlay) {
+			if (overlayItem instanceof RoiOverlay && overlayItem.isDrawn()) {
 				g.setColor(overlayItem.getColor());
 				// TODO Improve computation of position
 				g.drawString("R", 2, this.getHeight() - 2);
 			}
 			
-			if (overlayItem instanceof ScalebarOverlay) {
+			if (overlayItem instanceof ScalebarOverlay && overlayItem.isDrawn()) {
 				g.setColor(overlayItem.getColor());
 				// TODO Improve computation of position
 				g.drawString("S", this.getWidth()-10, this.getHeight() - 2);
@@ -166,13 +160,11 @@ class MontageItem extends JButton implements ActionListener, ItemListener {
 		if (e.getSource() instanceof MenuItem) {
 			MenuItem item = (MenuItem) e.getSource();
 			if (item.getName().equals("clearItem")) {
-				overlays.clear();
+				overlays.forEach(overlay -> overlay.setDrawn(false));
 				menu.clearMenu();
 			} else if (item.getName().equals("compositeItem")) {
-				for (int i = 1; i <= tool.getImp().getNChannels(); i++) {
-					MontageItemOverlay overlayForChannel = MontageUtil
-							.getOverlayForChannel(tool.getImp(), i);
-					overlays.add(overlayForChannel);
+				for (int i = 0; i < tool.getImp().getNChannels(); i++) {
+					overlays.get(i).setDrawn(true);
 				}
 				menu.composite();
 			}
@@ -209,32 +201,29 @@ class MontageItem extends JButton implements ActionListener, ItemListener {
 			
 			if (item.getName().equals("roiItem")) {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
-					overlays.add(new RoiOverlay(Color.WHITE));
+					enableRoiDrawing();
 					item.setState(true);
 				} else {
-					removeRoi();
+					disableRoiDrawing();
 					item.setState(false);
 				}
 			} else if (item.getName().equals("scalebarItem")) {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
-					overlays.add(new ScalebarOverlay(Color.WHITE));
+					enableScalebarDrawing();
 					item.setState(true);
 				} else if (e.getStateChange() == ItemEvent.DESELECTED) {
-					removeScalebar();
+					disableScalebarDrawing();
 					item.setState(false);
 				}
 			} else {
 				// TODO Handle exceptions / improve in general
 				String[] splitName = item.getName().split("-");
-				MontageItemOverlay overlayForChannel = MontageUtil
-						.getOverlayForChannel(tool.getImp(),
-								Integer.parseInt(splitName[1]));
+				MontageItemOverlay overlay = overlayForChannel(Integer.parseInt(splitName[1])-1);
 				
-				if (e.getStateChange() == ItemEvent.SELECTED) {
-					overlays.add(overlayForChannel);
+				if (e.getStateChange() == ItemEvent.SELECTED) {					
+					overlay.setDrawn(true);
 				} else if (e.getStateChange() == ItemEvent.DESELECTED) {
-					// TODO Remove overlay
-					overlays.remove(overlayForChannel);
+					overlay.setDrawn(false);
 				}
 			}
 			
@@ -244,27 +233,67 @@ class MontageItem extends JButton implements ActionListener, ItemListener {
 	}
 	
 	/**
-	 * TODO Documentation
-	 * HACK Not optimized at all
+	 * TODO Document 0-based or 1-based
+	 * 
+	 * @param channel
+	 * @return
 	 */
-	private void removeScalebar() {
-		Iterator<MontageItemOverlay> iter = overlays.iterator();
-		while (iter.hasNext()) {
-			if (iter.next() instanceof ScalebarOverlay) {
-				iter.remove();
-			}
-		}
+	public MontageItemOverlay overlayForChannel(final int channel) {
+		return overlays.get(channel);
 	}
-	
+
 	/**
 	 * TODO Documentation
 	 * HACK Not optimized at all
 	 */
-	private void removeRoi() {
+	private void disableScalebarDrawing() {
 		Iterator<MontageItemOverlay> iter = overlays.iterator();
 		while (iter.hasNext()) {
-			if (iter.next() instanceof RoiOverlay) {
-				iter.remove();
+			MontageItemOverlay item = iter.next();
+			if (item instanceof ScalebarOverlay) {
+				item.setDrawn(false);
+			}
+		}
+	}
+
+	/**
+	 * TODO Documentation
+	 * HACK Not optimized at all
+	 */
+	private void enableScalebarDrawing() {
+		Iterator<MontageItemOverlay> iter = overlays.iterator();
+		while (iter.hasNext()) {
+			MontageItemOverlay item = iter.next();
+			if (item instanceof ScalebarOverlay) {
+				item.setDrawn(true);
+			}
+		}
+	}
+
+	/**
+	 * TODO Documentation
+	 * HACK Not optimized at all
+	 */
+	private void enableRoiDrawing() {
+		Iterator<MontageItemOverlay> iter = overlays.iterator();
+		while (iter.hasNext()) {
+			MontageItemOverlay item = iter.next();
+			if (item instanceof RoiOverlay) {
+				item.setDrawn(true);
+			}
+		}
+	}
+
+	/**
+	 * TODO Documentation
+	 * HACK Not optimized at all
+	 */
+	private void disableRoiDrawing() {
+		Iterator<MontageItemOverlay> iter = overlays.iterator();
+		while (iter.hasNext()) {
+			MontageItemOverlay item = iter.next();
+			if (item instanceof RoiOverlay) {
+				item.setDrawn(false);
 			}
 		}
 	}
@@ -276,7 +305,7 @@ class MontageItem extends JButton implements ActionListener, ItemListener {
 	 */
 	public boolean hasRoi() {
 		// FIXME Non-functional default implementation
-		return overlays.contains(new RoiOverlay(Color.WHITE));
+		return overlays.contains(new RoiOverlay());
 	}
 	
 	/**
@@ -286,7 +315,7 @@ class MontageItem extends JButton implements ActionListener, ItemListener {
 	 */
 	public boolean hasScalebar() {
 		// FIXME Non-functional default implementation
-		return overlays.contains(new ScalebarOverlay(Color.WHITE));
+		return overlays.contains(new ScalebarOverlay());
 	}
 
 	/**

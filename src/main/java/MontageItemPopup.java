@@ -38,6 +38,9 @@ class MontageItemPopup extends PopupMenu {
 			// TODO Check if an overlay exists for that LUT
 			CheckboxMenuItem channelItem = new CheckboxMenuItem(MontageUtil.getLUTName(lut),
 					item.overlaysContain(lut) ? true : false);
+			if (item.overlayForChannel(i-1).isDrawn()) {
+				channelItem.setState(true);
+			}
 			channelItems.add(channelItem);
 			channelItem.setName("channel-"+i++);
 			channelItem.addItemListener(item);

@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Collection;
+import java.util.LinkedList;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -22,6 +23,8 @@ public class MontageFrame extends JFrame implements ActionListener {
 	
 	public MontageFrame(MontageTool montageTool) {
 		super();
+		
+		actionListeners = new LinkedList<>();
 		
 		panel = new MontagePanel(montageTool);
 		getContentPane().add(BorderLayout.CENTER, panel);
