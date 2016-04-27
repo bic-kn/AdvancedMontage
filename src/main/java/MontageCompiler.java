@@ -84,7 +84,7 @@ public class MontageCompiler implements ActionListener {
 		int inputWidth = tool.getImp().getWidth();
 		int inputHeight = tool.getImp().getHeight();
 		
-		if (item.getOverlays().isEmpty()) {
+		if (!item.hasDrawnOverlay()) {
 			return;
 		}
 		
