@@ -244,35 +244,37 @@ public class MontageCompiler implements ActionListener {
 		// overlay.remove(SCALE_BAR);
 		
 		// TODO Get from global settings
-		double barWidth = 4.5d;
+		double barWidth = tool.getBarWidth();
 		
 		// TODO Get from global settings
-		String location = "Lower Right";
+		String location = tool.getScalebarLocation();
 		
 		// TODO Get from global settings
-		int barHeightInPixels = 2;
+		int fontSize = tool.getFontSize();
 		
 		// TODO Get from global settings
-		int fontSize = 42;
+		int barHeightInPixels = (int) Math.floor(tool.getBarHeight()*fontSize);
 		
 		// TODO Get from global settings
-		int paddingWidth = 10;
+		int paddingWidth = tool.getPaddingWidth();
 		
 		// TODO Get from global settings
-		Color color = Color.WHITE;
+		Color color = tool.getScalebarColor();
 
-		Point scalebarLocation = computeScalebarLocation(item);
-		
+		Point scalebarLocation = computeScalebarLocation(item);		
 		int x = scalebarLocation.x;
 		int y = scalebarLocation.y;
+		
 		int fontType = boldText?Font.BOLD:Font.PLAIN;
 		String face = serifFont?"Serif":"SanSerif";
 		Font font = new Font(face, fontType, fontSize);
 		String label = getLength(barWidth) + " "+ getUnits(tool.getImp());
+		
 		ImageProcessor ip = tool.getImp().getProcessor();
 		ip.setFont(font);
 		int textWidth = hideText?0:ip.getStringWidth(label);
 		Calibration cal = tool.getImp().getCalibration();
+		
 		int barWidthInPixels = (int)(barWidth/cal.pixelWidth);
 		Roi bar = new Roi(x, y, barWidthInPixels, barHeightInPixels);
 		bar.setFillColor(color);
@@ -280,7 +282,7 @@ public class MontageCompiler implements ActionListener {
 		overlay.add(bar);
 		
 		int xoffset = (barWidthInPixels - textWidth)/2;
-		int yoffset =  barHeightInPixels + (hideText?0:fontSize+fontSize/4);
+		int yoffset =  2*barHeightInPixels;
 		if (!hideText) {
 			TextRoi text = new TextRoi(x+xoffset, y+yoffset, label, font);
 			text.setStrokeColor(color);

@@ -47,18 +47,18 @@ public class MontageTool extends AbstractTool
 	
 	// Scalebar
 	String fontName;
-	double fontSize;
-	double scalebarWidth;
-	double scalebarHeight;
-	String scalebarPosition;
-	Color scalebarColor;
+	double fontSize = 42;
+	double scalebarWidth = 10.0;
+	double scalebarHeight = 0.25;
+	String scalebarPosition = "Lower Right";
+	Color scalebarColor = Color.WHITE;
 	
 	// ROI
 	String roiColor;
 	
 	// Padding
-	int paddingWidth;
-	Color paddingColor;
+	int paddingWidth = 10;
+	Color paddingColor = Color.WHITE;
 	
 	/** Tile size in pixels */
 	private static int TILE_SIZE = 20;
@@ -279,21 +279,6 @@ public class MontageTool extends AbstractTool
 		return imp;
 	}
 
-	/**
-	 * @return the padding width
-	 */
-	public int getPaddingWidth() {
-		return paddingWidth;
-	}
-
-	/**
-	 * @return the padding color
-	 */
-	public Color getPaddingColor() {
-		// TODO Add correct implementation
-		return Color.WHITE;
-	}
-
 	public Collection<MontageItem> getMontageItems() {
 		Component[] components = montageFrame.getPanel().getComponents();
 		Collection<MontageItem> montageItems = new LinkedList<>();
@@ -341,4 +326,65 @@ public class MontageTool extends AbstractTool
 		
 		return Color.WHITE;
 	}
+
+	/**
+	 * @return the padding width
+	 */
+	public int getPaddingWidth() {
+		return paddingWidth;
+	}
+
+	/**
+	 * @return the padding color
+	 */
+	public Color getPaddingColor() {
+		return paddingColor;
+	}
+
+	/**
+	 * TODO Documentation
+	 * 
+	 * @return
+	 */
+	public Color getScalebarColor() {
+		return scalebarColor;
+	}
+
+	/**
+	 * TODO Documentation
+	 * 
+	 * @return
+	 */
+	public int getFontSize() {
+		// TODO Fix implementation
+		return (int) fontSize;
+	}
+
+	/**
+	 * TODO Documentation
+	 * 
+	 * @return
+	 */
+	public String getScalebarLocation() {
+		return scalebarPosition;
+	}
+
+	/**
+	 * TODO Documentation
+	 * 
+	 * @return
+	 */
+	public double getBarHeight() {
+		return scalebarHeight;
+	}
+
+	/**
+	 * TODO Documentation
+	 * 
+	 * @return
+	 */
+	public double getBarWidth() {
+		return scalebarWidth;
+	}
+	
 }
