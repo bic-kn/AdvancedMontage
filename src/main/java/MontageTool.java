@@ -64,33 +64,21 @@ public class MontageTool extends AbstractTool
 	private static int TILE_SIZE = 20;
 	
 	@Override
-	public void focusGained(FocusEvent e) {
-		// TODO Auto-generated method stub
+	public void run(String arg) {				
+		// getToolId() returns -1 if no tool with the given name is found
+		Toolbar toolbar = Toolbar.getInstance();		
+		if (toolbar.getToolId(getToolName()) >= 0) {
+			return;
+		}
 		
-	}
-
-	@Override
-	public void focusLost(FocusEvent e) {
-		// TODO Auto-generated method stub
+		// Let's add our tool as focus listener
+		WindowManager.getCurrentWindow().addFocusListener(this);
 		
-	}
-
-	@Override
-	public void keyTyped(KeyEvent e) {
-		// TODO Auto-generated method stub
+		// Init options dialog
+		initOptionDialog();
 		
-	}
-
-	@Override
-	public void keyPressed(KeyEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void keyReleased(KeyEvent e) {
-		// TODO Auto-generated method stub
-		
+		// Launch interactive mode
+		super.run(arg);
 	}
 
 	@Override
@@ -103,25 +91,7 @@ public class MontageTool extends AbstractTool
 		return "C000F00ffCfffT5e12MCf00F2244C0f0F6244Cf0fFa244Cff0F2644C0ffF6644";
 	}
 	
-	@Override
-	public void run(String arg) {				
-		// getToolId() returns -1 if no tool with the given name is found
-		Toolbar toolbar = Toolbar.getInstance();		
-		if (toolbar.getToolId(getToolName()) >= 0) {
-			return;
-		}
-		
-		// Let's add our tool as focus listener
-		WindowManager.getCurrentWindow().addFocusListener(this);
-		
-		// Init options dialog
-		initOptionsDialog();
-		
-		// Launch interactive mode
-		super.run(arg);
-	}
-
-	private void initOptionsDialog() {
+	private void initOptionDialog() {
 		gd = new GenericDialog("Montage Options");
 		
 		// Time Stamp
@@ -154,6 +124,15 @@ public class MontageTool extends AbstractTool
 	}
 
 	@Override
+	public void showOptionDialog() {
+		gd.showDialog();
+		
+		if (!gd.wasCanceled()) {
+			parseOptionsFromDialog(gd);
+		}
+	}
+	
+	@Override
 	public void toolToggled(boolean enabled) {
 		imp = WindowManager.getCurrentImage();
 		
@@ -164,57 +143,6 @@ public class MontageTool extends AbstractTool
 		MontageCompiler compiler = new MontageCompiler(this);
 		montageFrame = new MontageFrame(this);
 		montageFrame.addActionListener(compiler);
-	}
-
-	@Override
-	public void mouseClicked(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void mousePressed(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void mouseReleased(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void mouseEntered(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void mouseExited(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void mouseDragged(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void mouseMoved(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void showOptionDialog() {
-		gd.showDialog();
-		
-		if (!gd.wasCanceled()) {
-			parseOptionsFromDialog(gd);
-		}
 	}
 
 	/**
@@ -386,5 +314,43 @@ public class MontageTool extends AbstractTool
 	public double getBarWidth() {
 		return scalebarWidth;
 	}
+	
+	// ------- unused events --------
+	
+	@Override
+	public void focusGained(FocusEvent e) { /* NB */ }
+
+	@Override
+	public void focusLost(FocusEvent e) { /* NB */ }
+
+	@Override
+	public void keyTyped(KeyEvent e) { /* NB */ }
+
+	@Override
+	public void keyPressed(KeyEvent e) { /* NB */ }
+
+	@Override
+	public void keyReleased(KeyEvent e) { /* NB */ }
+	
+	@Override
+	public void mouseClicked(MouseEvent e) { /* NB */ }
+
+	@Override
+	public void mousePressed(MouseEvent e) { /* NB */ }
+
+	@Override
+	public void mouseReleased(MouseEvent e) { /* NB */ }
+
+	@Override
+	public void mouseEntered(MouseEvent e) { /* NB */ }
+
+	@Override
+	public void mouseExited(MouseEvent e) { /* NB */ }
+
+	@Override
+	public void mouseDragged(MouseEvent e) { /* NB */ }
+
+	@Override
+	public void mouseMoved(MouseEvent e) { /* NB */ }
 	
 }
