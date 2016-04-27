@@ -107,20 +107,20 @@ public class MontageTool extends AbstractTool
 		// Scalebar
 		gd.addMessage("Scalebar Settings");
 		gd.addStringField("Font", "SansSerif");
-		gd.addNumericField("Font size", 42, 0);
-		gd.addNumericField("Width", 10, 1, 4, "[unit]");
-		gd.addNumericField("Height", 0.250, 3, 5, "[%]");
-		gd.addChoice("Position", new String[]{"Lower Right", "Lower Left"}, "Lower Right");
-		gd.addChoice("Color", new String[]{"White", "Black"}, "White");
+		gd.addNumericField("Font size", getFontSize(), 0);
+		gd.addNumericField("Width", getBarWidth(), 1, 4, "[unit]");
+		gd.addNumericField("Height", getBarHeight(), 3, 5, "[%]");
+		gd.addChoice("Position", new String[]{"Lower Right"/*, "Lower Left", "Upper Right", "Upper Left", "At Selection"*/}, getScalebarLocation());
+		gd.addChoice("Color", new String[]{"White"/*, "Black"*/}, "White");
 		
 		// ROI
 		gd.addMessage("ROI Settings");
-		gd.addChoice("Color", new String[]{"White", "Black"}, "White");
+		gd.addChoice("Color", new String[]{"White"/*, "Black"*/}, "White");
 		
 		// Padding
 		gd.addMessage("Padding");
-		gd.addNumericField("Width", 10, 0, 4, "[px]");
-		gd.addChoice("Color", new String[]{"White", "Black"}, "White");
+		gd.addNumericField("Width", getPaddingWidth(), 0, 4, "[px]");
+		gd.addChoice("Color", new String[]{"White"/*, "Black"*/}, "White");
 	}
 
 	@Override
