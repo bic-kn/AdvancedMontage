@@ -53,14 +53,15 @@ public class ComponentMover extends MouseAdapter
 	private Cursor originalCursor;
 	private boolean autoscrolls;
 	private boolean potentialDrag;
+	private Component swappedComponent;
+	private Point swappedComponentPreviousLocation;
 
 
 	/**
-	 *  Constructor for moving individual components. The components must be
-	 *  regisetered using the registerComponent() method.
+	 * Constructor for moving individual components. The components must be
+	 * registered using the registerComponent() method.
 	 */
-	public ComponentMover()
-	{
+	public ComponentMover() {
 	}
 
 	/**
@@ -286,12 +287,11 @@ public class ComponentMover extends MouseAdapter
 	}
 
 	/**
-	 *  Move the component to its new location. The dragged Point must be in
-	 *  the destination coordinates.
+	 * Move the component to its new location. The dragged Point must be in the
+	 * destination coordinates.
 	 */
 	@Override
-	public void mouseDragged(MouseEvent e)
-	{
+	public void mouseDragged(MouseEvent e) {
 		Point dragged = e.getLocationOnScreen();
 		int dragX = getDragDistance(dragged.x, pressed.x, snapSize.width);
 		int dragY = getDragDistance(dragged.y, pressed.y, snapSize.height);
@@ -299,9 +299,9 @@ public class ComponentMover extends MouseAdapter
 		int locationX = location.x + dragX;
 		int locationY = location.y + dragY;
 
-		//  Mouse dragged events are not generated for every pixel the mouse
-		//  is moved. Adjust the location to make sure we are still on a
-		//  snap value.
+		// Mouse dragged events are not generated for every pixel the mouse
+		// is moved. Adjust the location to make sure we are still on a
+		// snap value.
 
 		while (locationX < edgeInsets.left)
 			locationX += snapSize.width;
@@ -309,7 +309,7 @@ public class ComponentMover extends MouseAdapter
 		while (locationY < edgeInsets.top)
 			locationY += snapSize.height;
 
-		Dimension d = getBoundingSize( destination );
+		Dimension d = getBoundingSize(destination);
 
 		while (locationX + destination.getSize().width + edgeInsets.right > d.width)
 			locationX -= snapSize.width;
@@ -317,8 +317,18 @@ public class ComponentMover extends MouseAdapter
 		while (locationY + destination.getSize().height + edgeInsets.bottom > d.height)
 			locationY -= snapSize.height;
 
-		//  Adjustments are finished, move the component
+		// Restore old location for swapped component
+		if (swappedComponent != null) {
+			swappedComponent.setLocation(swappedComponentPreviousLocation.x, swappedComponentPreviousLocation.y);
+		}
 
+		// Get component that was originally at (locationX, locationY)
+		Component componentUnderCursor = destination.getParent().getComponentAt(locationX, locationY);
+		swappedComponent = componentUnderCursor;
+		swappedComponentPreviousLocation = componentUnderCursor.getLocation();
+		componentUnderCursor.setLocation(location.x, location.y);
+
+		// Adjustments are finished, move the component
 		destination.setLocation(locationX, locationY);
 	}
 
@@ -361,6 +371,8 @@ public class ComponentMover extends MouseAdapter
 	{
 		if (!potentialDrag) return;
 
+		swappedComponent = null;
+		swappedComponentPreviousLocation = null;
 		source.removeMouseMotionListener( this );
 		potentialDrag = false;
 

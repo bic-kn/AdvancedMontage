@@ -1,5 +1,6 @@
 // TODO Missing license header
 
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +36,7 @@ public class MontagePanel extends JPanel {
 		int numberOfChannels = tool.getImp().getNChannels();
 		
 		// TODO Set the defaults
-//		ComponentMover cm = new ComponentMover();
+		ComponentMover cm = new ComponentMover();
 		for (int i=0; i<ROWS*COLUMNS; i++) {
 			List<MontageItemOverlay> defaultOverlays = new ArrayList<>();
 			
@@ -66,11 +67,11 @@ public class MontagePanel extends JPanel {
 			}
 			
 			this.add(item);
-//			cm.registerComponent(item);
+			cm.registerComponent(item);
 		}
 		
 	    // TODO Set correct snap size
-//	    cm.setSnapSize(new Dimension(40, 40));
+	    cm.setSnapSize(new Dimension(50, 35));
 	}
 	
 }
