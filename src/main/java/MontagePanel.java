@@ -63,9 +63,6 @@ public class MontagePanel extends JPanel {
 				for (int j=0; j<numberOfChannels; j++) {
 					defaultOverlays.get(j).setDrawn(true);
 				}
-			} else {
-				// No overlay
-				item = new MontageItem(tool);
 			}
 			
 			this.add(item);
