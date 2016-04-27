@@ -3,7 +3,9 @@ import java.awt.Font;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import ij.CompositeImage;
 import ij.IJ;
@@ -14,7 +16,6 @@ import ij.gui.Overlay;
 import ij.gui.Roi;
 import ij.gui.TextRoi;
 import ij.measure.Calibration;
-import ij.plugin.HyperStackConverter;
 import ij.plugin.ScaleBar;
 import ij.plugin.frame.RoiManager;
 import ij.process.ByteProcessor;
@@ -87,15 +88,17 @@ public class MontageCompiler implements ActionListener {
 			return;
 		}
 		
-		LUT[] luts = tool.getAvailableLuts();
+		LUT[] availableLuts = tool.getAvailableLuts();
+		List<LUT> usedLuts = new ArrayList<>();
 		
 		// Create composite from ChannelOverlays
 		ImageStack stack = new ImageStack(inputWidth, inputHeight);
 		for (MontageItemOverlay overlay : item.getOverlays()) {
 			if (overlay instanceof ChannelOverlay && overlay.isDrawn()) {
 				ImageProcessor channelImageProcessor = extractChannelFromInput((ChannelOverlay) overlay);
-				channelImageProcessor.setLut(luts[((ChannelOverlay) overlay).getChannel()-1]);
+				channelImageProcessor.setLut(availableLuts[((ChannelOverlay) overlay).getChannel()-1]);
 				stack.addSlice(channelImageProcessor);
+				usedLuts.add(availableLuts[((ChannelOverlay) overlay).getChannel()-1]);
 			}
 		}
 		ImagePlus tempImp = new ImagePlus("Composite Temp", stack);
@@ -103,6 +106,7 @@ public class MontageCompiler implements ActionListener {
 			tempImp.show();
 		}
 		CompositeImage compositeImage = new CompositeImage(tempImp, CompositeImage.COMPOSITE);
+		compositeImage.setLuts((LUT[]) usedLuts.toArray(new LUT[usedLuts.size()]));
 		if (IJ.debugMode) {
 			compositeImage.show();
 		}
