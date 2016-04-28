@@ -1,5 +1,7 @@
 // TODO Missing license header
 
+import com.sun.tools.javac.util.List;
+
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -10,9 +12,13 @@ import java.awt.Rectangle;
 import java.awt.Window;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.LinkedList;
 
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
+
+import ij.IJ;
 
 /**
  * This class allows you to move a Component by using a mouse. The Component
@@ -284,12 +290,16 @@ public class ComponentMover extends MouseAdapter
 			autoscrolls = jc.getAutoscrolls();
 			jc.setAutoscrolls( false );
 		}
+		
+		swappedComponent = null;
+		swappedComponentPreviousLocation = null;
 	}
 
 	/**
 	 * Move the component to its new location. The dragged Point must be in the
 	 * destination coordinates.
 	 */
+	@SuppressWarnings("null")
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		Point dragged = e.getLocationOnScreen();
@@ -323,13 +333,57 @@ public class ComponentMover extends MouseAdapter
 		}
 
 		// Get component that was originally at (locationX, locationY)
-		Component componentUnderCursor = destination.getParent().getComponentAt(locationX, locationY);
-		swappedComponent = componentUnderCursor;
-		swappedComponentPreviousLocation = componentUnderCursor.getLocation();
-		componentUnderCursor.setLocation(location.x, location.y);
-
+		Component componentUnderCursor = componentUnderCursorThatIsNotDestination(locationX, locationY);
+		if (componentUnderCursor != null) {	
+			if (!componentUnderCursor.equals(destination)) {
+				swappedComponent = componentUnderCursor;
+				swappedComponentPreviousLocation = componentUnderCursor.getLocation();
+				if (IJ.debugMode)
+					System.out.println("Swapped Item Location: ("+swappedComponentPreviousLocation.x+","+swappedComponentPreviousLocation.y+")");
+			}
+			componentUnderCursor.setLocation(location.x, location.y);
+		}
+		
 		// Adjustments are finished, move the component
 		destination.setLocation(locationX, locationY);
+		
+		if (IJ.debugMode)
+			System.out.println("Dragged Item Location: ("+locationX+","+locationY+")");
+	}
+
+	/**
+	 * TODO Documentation?
+	 * 
+	 * @param locationX
+	 * @param locationY
+	 * @return The {@link Component} under the cursor that is not the
+	 *         destination {@link Component}. Returns null if only the
+	 *         destination is located under the cursor.
+	 */
+	private Component componentUnderCursorThatIsNotDestination(int locationX, int locationY) {
+		Component componentUnderCursor = null;
+
+		ArrayList<Component> containingComponents = new ArrayList<>();
+		for (Component comp : destination.getParent().getComponents()) {
+			if (comp.getBounds().contains(locationX, locationY)) {
+				containingComponents.add(comp);
+			}
+		}
+		
+		if (IJ.debugMode)
+			System.out.println(containingComponents);
+		
+		if (containingComponents.size() > 1) {
+			for (Component comp : containingComponents) {
+				if (!comp.equals(destination)) {
+					componentUnderCursor = comp;
+				}
+			}
+		} else if (containingComponents.size() == 1) {
+			componentUnderCursor = containingComponents.get(0);
+		}
+		
+		return componentUnderCursor;
 	}
 
 	/*

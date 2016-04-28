@@ -137,7 +137,7 @@ public class MontageTool extends AbstractTool
 		imp = WindowManager.getCurrentImage();
 		
 		if (imp == null) {
-			// TODO Handle activation without open image
+			return;
 		}
 		
 		MontageCompiler compiler = new MontageCompiler(this);

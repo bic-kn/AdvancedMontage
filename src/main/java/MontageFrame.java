@@ -3,6 +3,8 @@
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -14,7 +16,7 @@ import javax.swing.JFrame;
  * 
  * @author Stefan Helfrich (University of Konstanz)
  */
-public class MontageFrame extends JFrame implements ActionListener {      
+public class MontageFrame extends JFrame implements ActionListener, ComponentListener {      
 	
 	MontagePanel panel;
 	JButton compileButton;
@@ -39,6 +41,8 @@ public class MontageFrame extends JFrame implements ActionListener {
 		setVisible(true);
 		
 		panel.setSnapSize();
+		
+		addComponentListener(this);
 	}
 	
 	/**
@@ -61,5 +65,19 @@ public class MontageFrame extends JFrame implements ActionListener {
 	public MontagePanel getPanel() {
 		return panel;
 	}
+
+	@Override
+	public void componentResized(ComponentEvent e) {
+		panel.setSnapSize();
+	}
+
+	@Override
+	public void componentMoved(ComponentEvent e) { /* NB */	}
+
+	@Override
+	public void componentShown(ComponentEvent e) { /* NB */	}
+
+	@Override
+	public void componentHidden(ComponentEvent e) { /* NB */ }
 	
 }
