@@ -10,6 +10,7 @@ import java.util.LinkedList;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.WindowConstants;
 
 /**
  * TODO Documentation
@@ -35,7 +36,7 @@ public class MontageFrame extends JFrame implements ActionListener, ComponentLis
 		compileButton.addActionListener(this);
 		getContentPane().add(BorderLayout.SOUTH, compileButton);
 		
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE );
+		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setSize(200,200);
 		setTitle("Montage");
 		setVisible(true);
