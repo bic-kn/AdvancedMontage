@@ -40,8 +40,8 @@ public class MontageCompiler implements ActionListener {
 	/**
 	 * TODO Documentation
 	 * 
-	 * @param panel
-	 * @return
+	 * @return {@link ImagePlus} with the images and the scalebar (if activated)
+	 *         as overlay
 	 */
 	public ImagePlus compileMontage() {	
 		Collection<MontageItem> montageItems = tool.getMontageItems();

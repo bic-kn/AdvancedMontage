@@ -230,8 +230,8 @@ public class MontageTool extends AbstractTool
 	/**
 	 * TODO Documentation
 	 * 
-	 * @param channel
-	 * @return
+	 * @param channel channel number
+	 * @return color from LUT for channel number
 	 */
 	public Color getColorForChannel(final int channel) {
 		if (channelToColor.get(channel) != null) {
@@ -272,7 +272,7 @@ public class MontageTool extends AbstractTool
 	/**
 	 * TODO Documentation
 	 * 
-	 * @return
+	 * @return the scalebar color
 	 */
 	public Color getScalebarColor() {
 		return scalebarColor;
@@ -281,7 +281,7 @@ public class MontageTool extends AbstractTool
 	/**
 	 * TODO Documentation
 	 * 
-	 * @return
+	 * @return the scalebare font size
 	 */
 	public int getFontSize() {
 		// TODO Fix implementation
@@ -291,7 +291,7 @@ public class MontageTool extends AbstractTool
 	/**
 	 * TODO Documentation
 	 * 
-	 * @return
+	 * @return the scalebar position
 	 */
 	public String getScalebarLocation() {
 		return scalebarPosition;
@@ -300,7 +300,7 @@ public class MontageTool extends AbstractTool
 	/**
 	 * TODO Documentation
 	 * 
-	 * @return
+	 * @return the scalebar width
 	 */
 	public double getBarHeight() {
 		return scalebarHeight;
@@ -309,7 +309,7 @@ public class MontageTool extends AbstractTool
 	/**
 	 * TODO Documentation
 	 * 
-	 * @return
+	 * @return the scalebar width
 	 */
 	public double getBarWidth() {
 		return scalebarWidth;
@@ -352,5 +352,13 @@ public class MontageTool extends AbstractTool
 
 	@Override
 	public void mouseMoved(MouseEvent e) { /* NB */ }
+
+	public void setImp(ImagePlus imp) {
+		this.imp = imp;
+	}
+
+	public void setFrame(MontageFrame montageFrame) {
+		this.montageFrame = montageFrame;
+	}
 	
 }
