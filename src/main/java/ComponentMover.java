@@ -1,7 +1,5 @@
 // TODO Missing license header
 
-import com.sun.tools.javac.util.List;
-
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -76,7 +74,7 @@ public class ComponentMover extends MouseAdapter
 	 *  will be passed to the first ancestor of this specified class.
 	 *
 	 *  @param destinationClass  the Class of the ancestor component
-	 *  @param component         the Components to be registered for forwarding
+	 *  @param components        the Components to be registered for forwarding
 	 *                           drag events to the ancestor Component.
 	 */
 	public ComponentMover(Class destinationClass, Component... components)
@@ -187,9 +185,10 @@ public class ComponentMover extends MouseAdapter
 	}
 
 	/**
-	 *  Remove listeners from the specified component
+	 * Remove listeners from the specified component
 	 *
-	 *  @param component  the component the listeners are removed from
+	 * @param components
+	 *            the component the listeners are removed from
 	 */
 	public void deregisterComponent(Component... components)
 	{
@@ -198,9 +197,10 @@ public class ComponentMover extends MouseAdapter
 	}
 
 	/**
-	 *  Add the required listeners to the specified component
+	 * Add the required listeners to the specified component
 	 *
-	 *  @param component  the component the listeners are added to
+	 * @param components
+	 *            the component the listeners are added to
 	 */
 	public void registerComponent(Component... components)
 	{
@@ -299,7 +299,6 @@ public class ComponentMover extends MouseAdapter
 	 * Move the component to its new location. The dragged Point must be in the
 	 * destination coordinates.
 	 */
-	@SuppressWarnings("null")
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		Point dragged = e.getLocationOnScreen();
@@ -411,10 +410,7 @@ public class ComponentMover extends MouseAdapter
 			Rectangle bounds = env.getMaximumWindowBounds();
 			return new Dimension(bounds.width, bounds.height);
 		}
-		else
-		{
-			return source.getParent().getSize();
-		}
+		return source.getParent().getSize();
 	}
 
 	/**
