@@ -226,19 +226,39 @@ public class MontageTool extends AbstractTool
 	
 	/** Compute channel/color mapping only once. */
 	private Map<Integer, Color> channelToColor = new HashMap<>();
-	
+
 	/**
 	 * TODO Documentation
 	 * 
-	 * @param channel channel number
+	 * @param channel 1-based channel number
 	 * @return color from LUT for channel number
 	 */
 	public Color getColorForChannel(final int channel) {
 		if (channelToColor.get(channel) != null) {
 			return channelToColor.get(channel);
 		}
+
+		LUT[] luts = getAvailableLuts();
+		Color c = new Color(luts[channel-1].getRGB(255));
+
+		// TODO If necessary, implement fix for green color
+//			if (Color.green.equals(c)) {
+//				c = new Color(0,180,0);
+//			}
+
+		channelToColor.put(channel, c);
+		return c;
+	}
+
+	/** Cache for channel number to {@link ChannelOverlay} mapping. */
+	private Map<Integer, MontageItemOverlay> overlayForChannelMap = new HashMap<>();
+
+	public MontageItemOverlay getOverlayForChannel(final int channel) {
+		if (overlayForChannelMap.get(channel) != null) {
+			return overlayForChannelMap.get(channel);
+		}
 		
-		if (getImp().isComposite()) {
+		if (imp.isComposite()) {
 			CompositeImage ci = (CompositeImage) imp;
 			ci.setC(channel);
 			if (ci.getMode() == IJ.COMPOSITE) {
@@ -247,12 +267,15 @@ public class MontageTool extends AbstractTool
 					c = new Color(0,180,0);
 				}
 				
-				channelToColor.put(channel, c);
-				return c;
+				MontageItemOverlay overlay = new ChannelOverlay(c, channel);
+				overlayForChannelMap.put(channel, overlay);
+				return overlay;
 			}
 		}
 		
-		return Color.WHITE;
+		MontageItemOverlay overlay = new ChannelOverlay(Color.WHITE, channel);
+		overlayForChannelMap.put(channel, overlay);
+		return overlay;
 	}
 
 	/**

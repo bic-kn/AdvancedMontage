@@ -2,9 +2,8 @@
 
 import java.awt.Color;
 
-import ij.CompositeImage;
-import ij.IJ;
 import ij.ImagePlus;
+import ij.process.LUT;
 
 /**
  * TODO Documentation
@@ -18,18 +17,15 @@ public class ChannelOverlay extends MontageItemOverlay {
 	public ChannelOverlay(final ImagePlus imp, final int channel) {
 		this(Color.WHITE, channel);
 		
-		if (imp.isComposite()) {
-			CompositeImage ci = (CompositeImage) imp;
-			ci.setC(channel);
-			if (ci.getMode() == IJ.COMPOSITE) {
-				Color c = ci.getChannelColor();
-				if (Color.green.equals(c)) {
-					c = new Color(0,180,0);
-				}
-				
-				setColor(c);
-			}
-		}
+		LUT[] luts = imp.getLuts();
+		Color c = new Color(luts[channel].getRGB(255));
+		
+		// TODO If necessary, implement fix for green color
+//			if (Color.green.equals(c)) {
+//				c = new Color(0,180,0);
+//			}
+			
+		setColor(c);
 	}
 	
 	/**
