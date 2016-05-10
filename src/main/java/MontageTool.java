@@ -18,7 +18,6 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
-import bsh.Modifiers;
 import fiji.tool.AbstractTool;
 import fiji.tool.ToolToggleListener;
 import fiji.tool.ToolWithOptions;
@@ -180,59 +179,6 @@ public class MontageTool extends AbstractTool
 		paddingColor = getColor(paddingColorString);
 	}
 
-	/**
-	 * Returns a {@link Color} instance for a provided String using the
-	 * Reflection API.
-	 * 
-	 * @param colorString
-	 *            color name
-	 * @return {@link Color} instance denoted by input
-	 */
-	private Color getColor(String colorString) {
-		Color color = null;
-		try {
-		    Field field = Class.forName("java.awt.Color").getField(colorString.toLowerCase());
-		    color = (Color) field.get(null);
-		} catch (Exception e) {
-			color = Color.WHITE; // Field not defined -> default
-		}
-		
-		return color;
-	}
-
-	/**
-	 * Main method for debugging.
-	 *
-	 * For debugging, it is convenient to have a method that starts ImageJ, loads an
-	 * image and calls the plugin, e.g. after setting breakpoints.
-	 *
-	 * @param args unused
-	 */
-	public static void main(String[] args) {
-		// set the plugins.dir property to make the plugin appear in the Plugins menu
-		Class<?> clazz = MontageTool.class;
-		String url = clazz.getResource("/" + clazz.getName().replace('.', '/') + ".class").toString();
-		String pluginsDir = url.substring("file:".length(), url.length() - clazz.getName().length() - ".class".length());
-		System.setProperty("plugins.dir", pluginsDir);
-
-		// start ImageJ
-		new ImageJ();
-
-		// open the Clown sample
-		ImagePlus image = IJ.openImage("/home/stefan/Dropbox/Konstanz/ImageJ Workshop 2016/2016/Examples/01/VH7.tif");
-		image.show();
-
-		// run the plugin
-		IJ.runPlugIn(clazz.getName(), "");
-	}
-	
-	/**
-	 * @return the imp
-	 */
-	public ImagePlus getImp() {
-		return imp;
-	}
-
 	public Collection<MontageItem> getMontageItems() {
 		Component[] components = montageFrame.getPanel().getComponents();
 		Collection<MontageItem> montageItems = new LinkedList<>();
@@ -248,32 +194,6 @@ public class MontageTool extends AbstractTool
 
 	public LUT[] getAvailableLuts() {
 		return getImp().getLuts();
-	}
-	
-	/** Compute channel/color mapping only once. */
-	private Map<Integer, Color> channelToColor = new HashMap<>();
-
-	/**
-	 * TODO Documentation
-	 * 
-	 * @param channel 1-based channel number
-	 * @return color from LUT for channel number
-	 */
-	public Color getColorForChannel(final int channel) {
-		if (channelToColor.get(channel) != null) {
-			return channelToColor.get(channel);
-		}
-
-		LUT[] luts = getAvailableLuts();
-		Color c = new Color(luts[channel-1].getRGB(255));
-
-		// TODO If necessary, implement fix for green color
-//			if (Color.green.equals(c)) {
-//				c = new Color(0,180,0);
-//			}
-
-		channelToColor.put(channel, c);
-		return c;
 	}
 
 	/** Cache for channel number to {@link ChannelOverlay} mapping. */
@@ -304,6 +224,84 @@ public class MontageTool extends AbstractTool
 		return overlay;
 	}
 
+	/** Compute channel/color mapping only once. */
+	private Map<Integer, Color> channelToColor = new HashMap<>();
+
+	/**
+	 * TODO Documentation
+	 * 
+	 * @param channel 1-based channel number
+	 * @return color from LUT for channel number
+	 */
+	public Color getColorForChannel(final int channel) {
+		if (channelToColor.get(channel) != null) {
+			return channelToColor.get(channel);
+		}
+
+		LUT[] luts = getAvailableLuts();
+		Color c = new Color(luts[channel-1].getRGB(255));
+
+		// TODO If necessary, implement fix for green color
+//			if (Color.green.equals(c)) {
+//				c = new Color(0,180,0);
+//			}
+
+		channelToColor.put(channel, c);
+		return c;
+	}
+	
+	private Set<String> availableColors = new HashSet<>();
+	
+	/**
+	 * Generates a set of available default colors from the statically defined
+	 * colors in {@code java.awt.Color}. This set does not contain duplicates.
+	 * It is cached to avoid unnecessary calls to the Reflection API.
+	 * 
+	 * @return set of available default colors
+	 */
+	public String[] availableColorsAsStrings() {
+		if (availableColors.isEmpty()) {
+			try {
+				Field[] fields = Class.forName("java.awt.Color").getFields();
+				for (Field field : fields) {
+					// Only handle static fields that are Color
+					Object fieldObject = field.get(null);
+					if (Modifier.isStatic(field.getModifiers()) && fieldObject instanceof Color) {
+						availableColors.add(field.getName().toLowerCase());
+					}
+				}
+			} catch (SecurityException | ClassNotFoundException | IllegalArgumentException
+					| IllegalAccessException ex) {
+				// TODO Add proper exception handling
+				ex.printStackTrace();
+			}
+		}
+
+		return availableColors.toArray(new String[availableColors.size()]);
+	}
+	
+	/**
+	 * Returns a {@link Color} instance for a provided String using the
+	 * Reflection API.
+	 * 
+	 * @param colorString
+	 *            color name
+	 * @return {@link Color} instance denoted by input
+	 */
+	private Color getColor(String colorString) {
+		Color color = null;
+		try {
+		    Field field = Class.forName("java.awt.Color").getField(colorString.toLowerCase());
+		    color = (Color) field.get(null);
+		} catch (Exception e) {
+			color = Color.WHITE; // Field not defined -> default
+		}
+		
+		return color;
+	}
+	
+	// ------- getters and setters --------
+	
 	/**
 	 * @return the padding width
 	 */
@@ -319,8 +317,6 @@ public class MontageTool extends AbstractTool
 	}
 
 	/**
-	 * TODO Documentation
-	 * 
 	 * @return the scalebar color
 	 */
 	public Color getScalebarColor() {
@@ -328,9 +324,7 @@ public class MontageTool extends AbstractTool
 	}
 
 	/**
-	 * TODO Documentation
-	 * 
-	 * @return the scalebare font size
+	 * @return the scalebar font size
 	 */
 	public int getFontSize() {
 		// TODO Fix implementation
@@ -338,8 +332,6 @@ public class MontageTool extends AbstractTool
 	}
 
 	/**
-	 * TODO Documentation
-	 * 
 	 * @return the scalebar position
 	 */
 	public String getScalebarLocation() {
@@ -347,8 +339,6 @@ public class MontageTool extends AbstractTool
 	}
 
 	/**
-	 * TODO Documentation
-	 * 
 	 * @return the scalebar width
 	 */
 	public double getBarHeight() {
@@ -356,12 +346,35 @@ public class MontageTool extends AbstractTool
 	}
 
 	/**
-	 * TODO Documentation
-	 * 
 	 * @return the scalebar width
 	 */
 	public double getBarWidth() {
 		return scalebarWidth;
+	}
+	
+	/**
+	 * @return the imp
+	 */
+	public ImagePlus getImp() {
+		return imp;
+	}
+	
+	/**
+	 * TODO Documentation
+	 * 
+	 * @param imp
+	 */
+	public void setImp(ImagePlus imp) {
+		this.imp = imp;
+	}
+
+	/**
+	 * TODO Documentation
+	 * 
+	 * @param montageFrame
+	 */
+	public void setFrame(MontageFrame montageFrame) {
+		this.montageFrame = montageFrame;
 	}
 	
 	// ------- unused events --------
@@ -401,43 +414,33 @@ public class MontageTool extends AbstractTool
 
 	@Override
 	public void mouseMoved(MouseEvent e) { /* NB */ }
-
-	public void setImp(ImagePlus imp) {
-		this.imp = imp;
-	}
-
-	public void setFrame(MontageFrame montageFrame) {
-		this.montageFrame = montageFrame;
-	}
-
-	private Set<String> availableColors = new HashSet<>();
+	
+	// ------- main method --------
 	
 	/**
-	 * Generates a set of available default colors from the statically defined
-	 * colors in {@code java.awt.Color}. This set does not contain duplicates.
-	 * It is cached to avoid unnecessary calls to the Reflection API.
-	 * 
-	 * @return set of available default colors
+	 * Main method for debugging.
+	 *
+	 * For debugging, it is convenient to have a method that starts ImageJ, loads an
+	 * image and calls the plugin, e.g. after setting breakpoints.
+	 *
+	 * @param args unused
 	 */
-	public String[] availableColorsAsStrings() {
-		if (availableColors.isEmpty()) {
-			try {
-				Field[] fields = Class.forName("java.awt.Color").getFields();
-				for (Field field : fields) {
-					// Only handle static fields that are Color
-					Object fieldObject = field.get(null);
-					if (Modifier.isStatic(field.getModifiers()) && fieldObject instanceof Color) {
-						availableColors.add(field.getName().toLowerCase());
-					}
-				}
-			} catch (SecurityException | ClassNotFoundException | IllegalArgumentException
-					| IllegalAccessException ex) {
-				// TODO Add proper exception handling
-				ex.printStackTrace();
-			}
-		}
+	public static void main(String[] args) {
+		// set the plugins.dir property to make the plugin appear in the Plugins menu
+		Class<?> clazz = MontageTool.class;
+		String url = clazz.getResource("/" + clazz.getName().replace('.', '/') + ".class").toString();
+		String pluginsDir = url.substring("file:".length(), url.length() - clazz.getName().length() - ".class".length());
+		System.setProperty("plugins.dir", pluginsDir);
 
-		return availableColors.toArray(new String[availableColors.size()]);
+		// start ImageJ
+		new ImageJ();
+
+		// open the Clown sample
+		ImagePlus image = IJ.openImage("/home/stefan/Dropbox/Konstanz/ImageJ Workshop 2016/2016/Examples/01/VH7.tif");
+		image.show();
+
+		// run the plugin
+		IJ.runPlugIn(clazz.getName(), "");
 	}
 	
 }
