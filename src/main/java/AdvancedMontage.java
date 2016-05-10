@@ -30,13 +30,15 @@ public class AdvancedMontage implements Command {
 	public void run() {
 		MontageTool tool = new MontageTool();
 		tool.setImp(dataset);
-		
+
 		MontageCompiler compiler = new MontageCompiler(tool);
 		montageFrame = new MontageFrame(tool);
 		montageFrame.addActionListener(compiler);
 		tool.setFrame(montageFrame);
+
+		tool.run("");
 	}
-	
+
 	/** Tests our command. */
 	public static void main(final String... args) throws Exception {
 		// Launch ImageJ as usual.
