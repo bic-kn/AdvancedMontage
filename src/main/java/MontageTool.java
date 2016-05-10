@@ -125,6 +125,8 @@ public class MontageTool extends AbstractTool
 
 	@Override
 	public void showOptionDialog() {
+		initOptionDialog();
+		
 		gd.showDialog();
 		
 		if (!gd.wasCanceled()) {
