@@ -10,11 +10,15 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Set;
 
+import bsh.Modifiers;
 import fiji.tool.AbstractTool;
 import fiji.tool.ToolToggleListener;
 import fiji.tool.ToolWithOptions;
@@ -406,13 +410,34 @@ public class MontageTool extends AbstractTool
 		this.montageFrame = montageFrame;
 	}
 
+	private Set<String> availableColors = new HashSet<>();
+	
 	/**
-	 * TODO Documentation
+	 * Generates a set of available default colors from the statically defined
+	 * colors in {@code java.awt.Color}. This set does not contain duplicates.
+	 * It is cached to avoid unnecessary calls to the Reflection API.
 	 * 
-	 * @return
+	 * @return set of available default colors
 	 */
-	public static String[] availableColorsAsStrings() {
-		return new String[]{"White", "Black", "Gray"};
+	public String[] availableColorsAsStrings() {
+		if (availableColors.isEmpty()) {
+			try {
+				Field[] fields = Class.forName("java.awt.Color").getFields();
+				for (Field field : fields) {
+					// Only handle static fields that are Color
+					Object fieldObject = field.get(null);
+					if (Modifier.isStatic(field.getModifiers()) && fieldObject instanceof Color) {
+						availableColors.add(field.getName().toLowerCase());
+					}
+				}
+			} catch (SecurityException | ClassNotFoundException | IllegalArgumentException
+					| IllegalAccessException ex) {
+				// TODO Add proper exception handling
+				ex.printStackTrace();
+			}
+		}
+
+		return availableColors.toArray(new String[availableColors.size()]);
 	}
 	
 }
