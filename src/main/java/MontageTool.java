@@ -9,6 +9,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -54,7 +55,7 @@ public class MontageTool extends AbstractTool
 	Color scalebarColor = Color.WHITE;
 	
 	// ROI
-	String roiColor;
+	Color roiColor = Color.WHITE;
 	
 	// Padding
 	int paddingWidth = 10;
@@ -161,15 +162,38 @@ public class MontageTool extends AbstractTool
 		fontSize = gd.getNextNumber();
 		scalebarWidth = gd.getNextNumber();
 		scalebarHeight = gd.getNextNumber();
-		scalebarPosition = gd.getNextChoice();	
-		scalebarColor = Color.getColor(gd.getNextChoice(), Color.WHITE);
-		
+		scalebarPosition = gd.getNextChoice();
+		String scalebarColorString = gd.getNextChoice().toLowerCase();
+		scalebarColor = getColor(scalebarColorString);
+
 		// ROI
-		roiColor = gd.getNextChoice();
+		String roiColorString = gd.getNextChoice().toLowerCase();
+		roiColor = getColor(roiColorString);
 		
 		// Padding
 		paddingWidth = (int) Math.floor(gd.getNextNumber());
-		paddingColor = Color.getColor(gd.getNextChoice(), Color.WHITE);
+		String paddingColorString = gd.getNextChoice();
+		paddingColor = getColor(paddingColorString);
+	}
+
+	/**
+	 * Returns a {@link Color} instance for a provided String using the
+	 * Reflection API.
+	 * 
+	 * @param colorString
+	 *            color name
+	 * @return {@link Color} instance denoted by input
+	 */
+	private Color getColor(String colorString) {
+		Color color = null;
+		try {
+		    Field field = Class.forName("java.awt.Color").getField(colorString.toLowerCase());
+		    color = (Color) field.get(null);
+		} catch (Exception e) {
+			color = Color.WHITE; // Field not defined -> default
+		}
+		
+		return color;
 	}
 
 	/**
