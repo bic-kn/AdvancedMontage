@@ -110,17 +110,17 @@ public class MontageTool extends AbstractTool
 		gd.addNumericField("Font size", getFontSize(), 0);
 		gd.addNumericField("Width", getBarWidth(), 1, 4, "[unit]");
 		gd.addNumericField("Height", getBarHeight(), 3, 5, "[%]");
-		gd.addChoice("Position", new String[]{"Lower Right"/*, "Lower Left", "Upper Right", "Upper Left", "At Selection"*/}, getScalebarLocation());
-		gd.addChoice("Color", new String[]{"White"/*, "Black"*/}, "White");
+		gd.addChoice("Position", new String[]{"Lower Right", "Lower Left", "Upper Right", "Upper Left", "At Selection"}, getScalebarLocation());
+		gd.addChoice("Color", availableColorsAsStrings(), "White");
 		
 		// ROI
 		gd.addMessage("ROI Settings");
-		gd.addChoice("Color", new String[]{"White"/*, "Black"*/}, "White");
+		gd.addChoice("Color", availableColorsAsStrings(), "White");
 		
 		// Padding
 		gd.addMessage("Padding");
 		gd.addNumericField("Width", getPaddingWidth(), 0, 4, "[px]");
-		gd.addChoice("Color", new String[]{"White"/*, "Black"*/}, "White");
+		gd.addChoice("Color", availableColorsAsStrings(), "White");
 	}
 
 	@Override
@@ -139,10 +139,6 @@ public class MontageTool extends AbstractTool
 		if (imp == null) {
 			return;
 		}
-		
-		MontageCompiler compiler = new MontageCompiler(this);
-		montageFrame = new MontageFrame(this);
-		montageFrame.addActionListener(compiler);
 	}
 
 	/**
@@ -382,6 +378,15 @@ public class MontageTool extends AbstractTool
 
 	public void setFrame(MontageFrame montageFrame) {
 		this.montageFrame = montageFrame;
+	}
+
+	/**
+	 * TODO Documentation
+	 * 
+	 * @return
+	 */
+	public static String[] availableColorsAsStrings() {
+		return new String[]{"White", "Black", "Gray"};
 	}
 	
 }

@@ -194,20 +194,11 @@ public class MontageCompiler implements ActionListener {
 	 * Adapted from {@link ScaleBar}.
 	 */
 	private Point computeScalebarLocation(MontageItem item) {
-		// TODO Get from global settings
-		double barWidth = 4.5d;
-		
-		// TODO Get from global settings
-		String location = "Lower Right";
-		
-		// TODO Get from global settings
-		int barHeightInPixels = 2;
-		
-		// TODO Get from global settings
-		int fontSize = 42;
-		
-		// TODO Get from global settings
-		int paddingWidth = 10;
+		double barWidth = tool.getBarWidth();		
+		String location = tool.getScalebarLocation();
+		int fontSize = tool.getFontSize();
+		int barHeightInPixels = (int) Math.floor(tool.getBarHeight()*fontSize);;
+		int paddingWidth = tool.getPaddingWidth();
 		
 		Calibration cal = tool.getImp().getCalibration();
 		int barWidthInPixels = (int)(barWidth/cal.pixelWidth);
@@ -240,25 +231,12 @@ public class MontageCompiler implements ActionListener {
 	 * Adapted from {@link ScaleBar}.
 	 */
 	private void addScalebarToOverlay(MontageItem item, Overlay overlay) {
-		// TODO Remove exisiting scalebar from overlay?
+		// TODO Remove existing scalebar from overlay?
 		// overlay.remove(SCALE_BAR);
-		
-		// TODO Get from global settings
+
 		double barWidth = tool.getBarWidth();
-		
-		// TODO Get from global settings
-		String location = tool.getScalebarLocation();
-		
-		// TODO Get from global settings
 		int fontSize = tool.getFontSize();
-		
-		// TODO Get from global settings
 		int barHeightInPixels = (int) Math.floor(tool.getBarHeight()*fontSize);
-		
-		// TODO Get from global settings
-		int paddingWidth = tool.getPaddingWidth();
-		
-		// TODO Get from global settings
 		Color color = tool.getScalebarColor();
 
 		Point scalebarLocation = computeScalebarLocation(item);		
