@@ -141,23 +141,36 @@ public class MontageCompiler implements ActionListener {
 			flattenedImp.show();
 		}
 		
+		Overlay flattenedImpOverlay = flattenedImp.getOverlay();
+		if (flattenedImpOverlay == null) {
+			flattenedImpOverlay = new Overlay();
+			flattenedImp.setOverlay(flattenedImpOverlay);
+		}
+		
+		Overlay outputImpOverlay = outputImp.getOverlay();
+		if (outputImpOverlay == null) {
+			outputImpOverlay = new Overlay();
+			outputImp.setOverlay(outputImpOverlay);
+		}
+		
+		Overlay scalebarOverlay = new Overlay();
+		for (MontageItemOverlay itemOverlay : item.getOverlays()) {
+			if (itemOverlay instanceof RoiOverlay && itemOverlay.isDrawn()) {
+				addROIsToOverlay(item, flattenedImpOverlay);
+				flattenedImp = flattenedImp.flatten();
+			} else if (itemOverlay instanceof ScalebarOverlay && itemOverlay.isDrawn()) {
+				addScalebarToOverlay(item, scalebarOverlay);
+			}
+		}
+		
 		ImageRoi flattenedImpRoi = new ImageRoi(
 				item.getColumn() * inputWidth + item.getColumn() * tool.getPaddingWidth(),
 				item.getRow() * inputHeight + item.getRow() * tool.getPaddingWidth(), flattenedImp.getProcessor());
 		
-		Overlay overlay = outputImp.getOverlay();
-		if (overlay == null) {
-			overlay = new Overlay();
-			outputImp.setOverlay(overlay);
-		}
-		overlay.add(flattenedImpRoi);
-		
-		for (MontageItemOverlay itemOverlay : item.getOverlays()) {
-			if (itemOverlay instanceof RoiOverlay && itemOverlay.isDrawn()) {
-				addROIsToOverlay(item, overlay);
-			} else if (itemOverlay instanceof ScalebarOverlay && itemOverlay.isDrawn()) {
-				addScalebarToOverlay(item, overlay);
-			}
+		// NB: The sequence of adding to the overlay determines the arrangement
+		outputImpOverlay.add(flattenedImpRoi);
+		for (Roi r : scalebarOverlay.toArray()) {
+			outputImpOverlay.add(r);
 		}
 	}
 
