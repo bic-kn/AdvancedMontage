@@ -15,7 +15,7 @@ import ij.ImagePlus;
  * 
  * @author Stefan Helfrich (University of Konstanz)
  */
-@Plugin(type = Command.class, headless = true, menuPath = "Plugins>BIC>Montage")
+@Plugin(type = Command.class, menuPath = "Plugins>BIC>Montage")
 public class AdvancedMontage implements Command {
 
 	@Parameter
