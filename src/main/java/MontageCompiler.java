@@ -19,6 +19,7 @@ import ij.measure.Calibration;
 import ij.plugin.ScaleBar;
 import ij.plugin.frame.RoiManager;
 import ij.process.ByteProcessor;
+import ij.process.ColorProcessor;
 import ij.process.ImageProcessor;
 import ij.process.LUT;
 
@@ -52,7 +53,7 @@ public class MontageCompiler implements ActionListener {
 		int outputWidth = computeOutputWidth(columns, tool.getPaddingWidth());
 		int outputHeight = computeOutputHeight(rows, tool.getPaddingWidth());
 		
-		ImageProcessor outputIp = new ByteProcessor(outputWidth, outputHeight);
+		ImageProcessor outputIp = new ColorProcessor(outputWidth, outputHeight);
 		outputIp.setColor(tool.getPaddingColor());
 		outputIp.fill();
 		ImagePlus outputImp = new ImagePlus("Montage", outputIp);
