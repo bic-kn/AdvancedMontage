@@ -154,14 +154,14 @@ public class MontageCompiler implements ActionListener {
 		
 		for (MontageItemOverlay itemOverlay : item.getOverlays()) {
 			if (itemOverlay instanceof RoiOverlay && itemOverlay.isDrawn()) {
-				addROIsToOverlay(overlay);
+				addROIsToOverlay(item, overlay);
 			} else if (itemOverlay instanceof ScalebarOverlay && itemOverlay.isDrawn()) {
 				addScalebarToOverlay(item, overlay);
 			}
 		}
 	}
 
-	private void addROIsToOverlay(Overlay overlay) {
+	private void addROIsToOverlay(MontageItem item, Overlay overlay) {
 		RoiManager roiManager = RoiManager.getInstance();
 		if (roiManager == null) {
 			return;
@@ -169,7 +169,16 @@ public class MontageCompiler implements ActionListener {
 
 		Roi[] roisInManager = roiManager.getRoisAsArray();
 		for (Roi roi : roisInManager) {
-			overlay.add(roi);
+			for (MontageItemOverlay itemOverlay : item.getOverlays()) {
+				if (itemOverlay.isDrawn()) {
+					if (itemOverlay instanceof ChannelOverlay) {
+						int itemOverlayChannel = ((ChannelOverlay) itemOverlay).getChannel();
+						if (roi.getPosition() == itemOverlayChannel) {
+							overlay.add(roi);
+						}
+					}
+				}
+			}
 		}
 	}
 
