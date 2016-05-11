@@ -18,7 +18,6 @@ import ij.gui.TextRoi;
 import ij.measure.Calibration;
 import ij.plugin.ScaleBar;
 import ij.plugin.frame.RoiManager;
-import ij.process.ByteProcessor;
 import ij.process.ColorProcessor;
 import ij.process.ImageProcessor;
 import ij.process.LUT;
@@ -58,18 +57,44 @@ public class MontageCompiler implements ActionListener {
 		outputIp.fill();
 		ImagePlus outputImp = new ImagePlus("Montage", outputIp);
 		
-		
 		for (MontageItem montageItem : montageItems) {
 			compileItem(montageItem, outputImp);
+			outputImp = outputImp.flatten();
+			cleanMontageTitle(outputImp);
 		}
 		
 		return outputImp;
 	}
 
+	/**
+	 * TODO Documentation
+	 * 
+	 * @param outputImp
+	 */
+	private void cleanMontageTitle(ImagePlus outputImp) {
+		String outputTitle = outputImp.getTitle();
+		String[] splitOutputTitle = outputTitle.split("Flat_");
+		outputImp.setTitle(splitOutputTitle[1]);
+	}
+
+	/**
+	 * TODO Documentation
+	 * 
+	 * @param columns
+	 * @param paddingWidth
+	 * @return
+	 */
 	private int computeOutputWidth(int columns, int paddingWidth) {
 		return columns*tool.getImp().getWidth() + (columns-1)*paddingWidth;
 	}
 	
+	/**
+	 * TODO Documentation
+	 * 
+	 * @param rows
+	 * @param paddingWidth
+	 * @return
+	 */
 	private int computeOutputHeight(int rows, int paddingWidth) {
 		return rows*tool.getImp().getHeight() + (rows-1)*paddingWidth;
 	}
