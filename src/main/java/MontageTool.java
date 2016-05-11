@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -58,7 +59,8 @@ public class MontageTool extends AbstractTool
 	}
 
 	private ImagePlus imp;
-
+	private List<ImagePlus> imps;
+	
 	private MontageFrame montageFrame; 
 	private GenericDialog gd;
 
@@ -265,7 +267,11 @@ public class MontageTool extends AbstractTool
 	}
 
 	public LUT[] getAvailableLuts() {
-		return getImp().getLuts();
+		return getAvailableLuts(getImp());
+	}
+	
+	public LUT[] getAvailableLuts(final ImagePlus imagePlus) {
+		return imagePlus.getLuts();
 	}
 
 	/** Cache for channel number to {@link ChannelOverlay} mapping. */
@@ -474,8 +480,6 @@ public class MontageTool extends AbstractTool
 		this.montageFrame = montageFrame;
 	}
 	
-	// ------- unused events --------
-	
 	/**
 	 * @return the fontName
 	 */
@@ -503,6 +507,16 @@ public class MontageTool extends AbstractTool
 	public void setRoiColor(Color roiColor) {
 		this.roiColor = roiColor;
 	}
+
+	public List<ImagePlus> getImps() {
+		return imps;
+	}
+
+	public void setImps(List<ImagePlus> imps) {
+		this.imps = imps;
+	}
+
+	// ------- unused events --------
 
 	@Override
 	public void focusGained(FocusEvent e) { /* NB */ }

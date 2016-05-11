@@ -1,9 +1,11 @@
 import java.awt.CheckboxMenuItem;
+import java.awt.Menu;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.util.ArrayList;
 import java.util.List;
 
+import ij.ImagePlus;
 import ij.process.LUT;
 
 class MontageItemPopup extends PopupMenu {
@@ -31,26 +33,32 @@ class MontageItemPopup extends PopupMenu {
 		clearItem.addActionListener(item);
 		this.add(clearItem);
 
-		// For all available channels in the image
-		channelItems = new ArrayList<>();
-		int i = 1;
-		for (LUT lut : tool.getAvailableLuts()) {
-			// TODO Check if an overlay exists for that LUT
-			CheckboxMenuItem channelItem = new CheckboxMenuItem(MontageUtil.getLUTName(lut, i),
-					item.overlaysContain(lut) ? true : false);
-			if (item.overlayForChannel(i-1).isDrawn()) {
-				channelItem.setState(true);
+		// TODO Add submenu for each open image
+		for (ImagePlus imp : tool.getImps()) {
+			Menu impMenu = new Menu(imp.getTitle());
+			this.add(impMenu);
+			
+			// For all available channels in the image
+			channelItems = new ArrayList<>();
+			int i = 1;
+			for (LUT lut : tool.getAvailableLuts(imp)) {
+				// TODO Check if an overlay exists for that LUT
+				CheckboxMenuItem channelItem = new CheckboxMenuItem(MontageUtil.getLUTName(lut, i),
+						item.overlaysContain(lut) ? true : false);
+				if (item.overlayForChannel(i-1).isDrawn()) {
+					channelItem.setState(true);
+				}
+				channelItems.add(channelItem);
+				channelItem.setName("channel-"+i++);
+				channelItem.addItemListener(item);
+				impMenu.add(channelItem);
 			}
-			channelItems.add(channelItem);
-			channelItem.setName("channel-"+i++);
-			channelItem.addItemListener(item);
-			this.add(channelItem);
+			
+			compositeItem = new MenuItem("Composite");
+			compositeItem.setName("compositeItem");
+			compositeItem.addActionListener(item);
+			impMenu.add(compositeItem);
 		}
-
-		compositeItem = new MenuItem("Composite");
-		compositeItem.setName("compositeItem");
-		compositeItem.addActionListener(item);
-		this.add(compositeItem);
 
 		roiItem = new CheckboxMenuItem("ROI", false);
 		roiItem.setName("roiItem");
