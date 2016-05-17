@@ -175,18 +175,39 @@ public class MontageCompiler implements ActionListener {
 	}
 
 	/**
-	 * TODO Documentation
+	 * Adds one of the following sets of {@link Roi}s to the provided
+	 * {@code Overlay} in the provided order (precedence from first to last):
+	 * 
+	 * <ol>
+	 * <li>The active ROI of the image to each of the selected channels</li>
+	 * <li>The selected ROIs in the RoiManager when the ROI option was activated
+	 * </li>
+	 * <li>The ROIs from the RoiManager if they belong to the drawn channel</li>
+	 * </ol>
 	 * 
 	 * @param item
+	 *            {@link MontageItem} from which the required information is
+	 *            extracted, i.e. the active ROIs from the RoiManager
 	 * @param overlay
+	 *            The {@link Overlay} to which the {@link Roi}s are added
 	 */
 	private void addROIsToOverlay(MontageItem item, Overlay overlay) {
 		// TODO Refactor code
+		/* The image has an active ROI */
+		Roi activeRoi = tool.getImp().getRoi();
+		if (activeRoi != null) {
+			overlay.add(activeRoi);
+			
+			// TODO Clear the ROIs from the RoiOverlay
+			return;
+		}
+		
 		for (MontageItemOverlay itemOverlay : item.getOverlays()) {
 			if (itemOverlay.isDrawn()) {
 				if (itemOverlay instanceof RoiOverlay) {
 					Roi[] rois = ((RoiOverlay) itemOverlay).getRois();
 					if (rois == null) {
+						/* The ROIs for each slice are drawn */
 						RoiManager roiManager = RoiManager.getRoiManager();
 						Roi[] roisInManager = roiManager.getRoisAsArray();
 						for (Roi roi : roisInManager) {
@@ -205,6 +226,7 @@ public class MontageCompiler implements ActionListener {
 						return;
 					}
 					
+					/* The selected ROIs are drawn */
 					for (Roi roi : rois) {
 						overlay.add(roi);
 					}
