@@ -59,7 +59,7 @@ public class MontageTool extends AbstractTool
 	private GenericDialog gd;
 	
 	// Scalebar
-	String fontName;
+	String fontName = "SansSerif";
 	double fontSize = 42;
 	double scalebarWidth = 10.0;
 	double scalebarHeight = 0.25;
@@ -125,21 +125,21 @@ public class MontageTool extends AbstractTool
 		
 		// Scalebar
 		gd.addMessage("Scalebar Settings");
-		gd.addStringField("Font", "SansSerif");
+		gd.addStringField("Font", getFontName());
 		gd.addNumericField("Font size", getFontSize(), 0);
 		gd.addNumericField("Width", getBarWidth(), 1, 4, "[unit]");
 		gd.addNumericField("Height", getBarHeight(), 3, 5, "[%]");
 		gd.addChoice("Position", new String[]{"Lower Right", "Lower Left", "Upper Right", "Upper Left", "At Selection"}, getScalebarLocation());
-		gd.addChoice("Color", availableColorsAsStrings(), "White");
+		gd.addChoice("Color", availableColorsAsStrings(), getColorName(getScalebarColor()));
 		
 		// ROI
 		gd.addMessage("ROI Settings");
-		gd.addChoice("Color", availableColorsAsStrings(), "White");
+		gd.addChoice("Color", availableColorsAsStrings(), getColorName(getRoiColor()));
 		
 		// Padding
 		gd.addMessage("Padding");
 		gd.addNumericField("Width", getPaddingWidth(), 0, 4, "[px]");
-		gd.addChoice("Color", availableColorsAsStrings(), "White");
+		gd.addChoice("Color", availableColorsAsStrings(), getColorName(getPaddingColor()));
 	}
 
 	@Override
@@ -303,6 +303,31 @@ public class MontageTool extends AbstractTool
 	 * Returns a {@link Color} instance for a provided String using the
 	 * Reflection API.
 	 * 
+	 * @param color
+	 * @return Name for the input. {@code null} if the color could not be found.
+	 */
+	private String getColorName(Color color) {
+		try {
+			Field[] fields = Class.forName("java.awt.Color").getFields();
+			for (Field field : fields) {
+				// Only handle static fields that are Color
+				Object fieldObject = field.get(null);
+				if (Modifier.isStatic(field.getModifiers()) && fieldObject instanceof Color && fieldObject.equals(color)) {
+					return field.getName().toLowerCase();
+				}
+			}
+		} catch (SecurityException | ClassNotFoundException | IllegalArgumentException
+				| IllegalAccessException ex) {
+			// TODO Add proper exception handling
+			ex.printStackTrace();
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * Returns the String representation for a {@link Color} instance.
+	 * 
 	 * @param colorString
 	 *            color name
 	 * @return {@link Color} instance denoted by input
@@ -398,6 +423,34 @@ public class MontageTool extends AbstractTool
 	
 	// ------- unused events --------
 	
+	/**
+	 * @return the fontName
+	 */
+	public String getFontName() {
+		return fontName;
+	}
+
+	/**
+	 * @param fontName the fontName to set
+	 */
+	public void setFontName(String fontName) {
+		this.fontName = fontName;
+	}
+
+	/**
+	 * @return the roiColor
+	 */
+	public Color getRoiColor() {
+		return roiColor;
+	}
+
+	/**
+	 * @param roiColor the roiColor to set
+	 */
+	public void setRoiColor(Color roiColor) {
+		this.roiColor = roiColor;
+	}
+
 	@Override
 	public void focusGained(FocusEvent e) { /* NB */ }
 
