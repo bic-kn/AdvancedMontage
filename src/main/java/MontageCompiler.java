@@ -174,27 +174,51 @@ public class MontageCompiler implements ActionListener {
 		}
 	}
 
+	/**
+	 * TODO Documentation
+	 * 
+	 * @param item
+	 * @param overlay
+	 */
 	private void addROIsToOverlay(MontageItem item, Overlay overlay) {
-		RoiManager roiManager = RoiManager.getInstance();
-		if (roiManager == null) {
-			return;
-		}
-
-		Roi[] roisInManager = roiManager.getRoisAsArray();
-		for (Roi roi : roisInManager) {
-			for (MontageItemOverlay itemOverlay : item.getOverlays()) {
-				if (itemOverlay.isDrawn()) {
-					if (itemOverlay instanceof ChannelOverlay) {
-						int itemOverlayChannel = ((ChannelOverlay) itemOverlay).getChannel();
-						if (roi.getPosition() == itemOverlayChannel) {
-							overlay.add(roi);
+		// TODO Refactor code
+		for (MontageItemOverlay itemOverlay : item.getOverlays()) {
+			if (itemOverlay.isDrawn()) {
+				if (itemOverlay instanceof RoiOverlay) {
+					Roi[] rois = ((RoiOverlay) itemOverlay).getRois();
+					if (rois == null) {
+						RoiManager roiManager = RoiManager.getRoiManager();
+						Roi[] roisInManager = roiManager.getRoisAsArray();
+						for (Roi roi : roisInManager) {
+							for (MontageItemOverlay itemOverlay2 : item.getOverlays()) {
+								if (itemOverlay2.isDrawn()) {
+									if (itemOverlay2 instanceof ChannelOverlay) {
+										int itemOverlayChannel = ((ChannelOverlay) itemOverlay2).getChannel();
+										if (roi.getPosition() == itemOverlayChannel) {
+											overlay.add(roi);
+										}
+									}
+								}
+							}
 						}
+						
+						return;
+					}
+					
+					for (Roi roi : rois) {
+						overlay.add(roi);
 					}
 				}
 			}
 		}
 	}
 
+	/**
+	 * TODO Documentation
+	 * 
+	 * @param overlay
+	 * @return
+	 */
 	private ImageProcessor extractChannelFromInput(ChannelOverlay overlay) {
 		ImageStack stack = tool.getImp().getStack();
 		return stack.getProcessor(overlay.getChannel());
