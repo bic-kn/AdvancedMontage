@@ -24,11 +24,17 @@ public class AdvancedMontage implements Command {
 	@Parameter
     private ConvertService convertService;
 	
+	/** TODO Documentation */
 	private MontageFrame montageFrame;
+	
+	/** TODO Documentation */
+	private MontageTool tool;
 	
 	@Override
 	public void run() {
-		MontageTool tool = new MontageTool();
+		if (tool == null) {
+			tool = new MontageTool();
+		}
 		tool.setImp(dataset);
 
 		MontageCompiler compiler = new MontageCompiler(tool);
