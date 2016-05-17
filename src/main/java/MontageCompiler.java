@@ -141,38 +141,106 @@ public class MontageCompiler implements ActionListener {
 			flattenedImp.show();
 		}
 		
+		Overlay flattenedImpOverlay = flattenedImp.getOverlay();
+		if (flattenedImpOverlay == null) {
+			flattenedImpOverlay = new Overlay();
+			flattenedImp.setOverlay(flattenedImpOverlay);
+		}
+		
+		Overlay outputImpOverlay = outputImp.getOverlay();
+		if (outputImpOverlay == null) {
+			outputImpOverlay = new Overlay();
+			outputImp.setOverlay(outputImpOverlay);
+		}
+		
+		Overlay scalebarOverlay = new Overlay();
+		for (MontageItemOverlay itemOverlay : item.getOverlays()) {
+			if (itemOverlay instanceof RoiOverlay && itemOverlay.isDrawn()) {
+				addROIsToOverlay(item, flattenedImpOverlay);
+				flattenedImp = flattenedImp.flatten();
+			} else if (itemOverlay instanceof ScalebarOverlay && itemOverlay.isDrawn()) {
+				addScalebarToOverlay(item, scalebarOverlay);
+			}
+		}
+		
 		ImageRoi flattenedImpRoi = new ImageRoi(
 				item.getColumn() * inputWidth + item.getColumn() * tool.getPaddingWidth(),
 				item.getRow() * inputHeight + item.getRow() * tool.getPaddingWidth(), flattenedImp.getProcessor());
 		
-		Overlay overlay = outputImp.getOverlay();
-		if (overlay == null) {
-			overlay = new Overlay();
-			outputImp.setOverlay(overlay);
+		// NB: The sequence of adding to the overlay determines the arrangement
+		outputImpOverlay.add(flattenedImpRoi);
+		for (Roi r : scalebarOverlay.toArray()) {
+			outputImpOverlay.add(r);
 		}
-		overlay.add(flattenedImpRoi);
+	}
+
+	/**
+	 * Adds one of the following sets of {@link Roi}s to the provided
+	 * {@code Overlay} in the provided order (precedence from first to last):
+	 * 
+	 * <ol>
+	 * <li>The active ROI of the image to each of the selected channels</li>
+	 * <li>The selected ROIs in the RoiManager when the ROI option was activated
+	 * </li>
+	 * <li>The ROIs from the RoiManager if they belong to the drawn channel</li>
+	 * </ol>
+	 * 
+	 * @param item
+	 *            {@link MontageItem} from which the required information is
+	 *            extracted, i.e. the active ROIs from the RoiManager
+	 * @param overlay
+	 *            The {@link Overlay} to which the {@link Roi}s are added
+	 */
+	private void addROIsToOverlay(MontageItem item, Overlay overlay) {
+		// TODO Refactor code
+		/* The image has an active ROI */
+		Roi activeRoi = tool.getImp().getRoi();
+		if (activeRoi != null && tool.getActiveRoiPreference() == MontageTool.ActiveRoiPreference.ROI) {
+			overlay.add(activeRoi);
+			
+			// TODO Clear the ROIs from the RoiOverlay
+			return;
+		}
 		
 		for (MontageItemOverlay itemOverlay : item.getOverlays()) {
-			if (itemOverlay instanceof RoiOverlay && itemOverlay.isDrawn()) {
-				addROIsToOverlay(overlay);
-			} else if (itemOverlay instanceof ScalebarOverlay && itemOverlay.isDrawn()) {
-				addScalebarToOverlay(item, overlay);
+			if (itemOverlay.isDrawn()) {
+				if (itemOverlay instanceof RoiOverlay) {
+					Roi[] rois = ((RoiOverlay) itemOverlay).getRois();
+					if (rois == null) {
+						/* The ROIs for each slice are drawn */
+						RoiManager roiManager = RoiManager.getRoiManager();
+						Roi[] roisInManager = roiManager.getRoisAsArray();
+						for (Roi roi : roisInManager) {
+							for (MontageItemOverlay itemOverlay2 : item.getOverlays()) {
+								if (itemOverlay2.isDrawn()) {
+									if (itemOverlay2 instanceof ChannelOverlay) {
+										int itemOverlayChannel = ((ChannelOverlay) itemOverlay2).getChannel();
+										if (roi.getPosition() == itemOverlayChannel) {
+											overlay.add(roi);
+										}
+									}
+								}
+							}
+						}
+						
+						return;
+					}
+					
+					/* The selected ROIs are drawn */
+					for (Roi roi : rois) {
+						overlay.add(roi);
+					}
+				}
 			}
 		}
 	}
 
-	private void addROIsToOverlay(Overlay overlay) {
-		RoiManager roiManager = RoiManager.getInstance();
-		if (roiManager == null) {
-			return;
-		}
-
-		Roi[] roisInManager = roiManager.getRoisAsArray();
-		for (Roi roi : roisInManager) {
-			overlay.add(roi);
-		}
-	}
-
+	/**
+	 * TODO Documentation
+	 * 
+	 * @param overlay
+	 * @return
+	 */
 	private ImageProcessor extractChannelFromInput(ChannelOverlay overlay) {
 		ImageStack stack = tool.getImp().getStack();
 		return stack.getProcessor(overlay.getChannel());

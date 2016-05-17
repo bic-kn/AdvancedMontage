@@ -20,6 +20,8 @@ import java.util.List;
 import javax.swing.JButton;
 import javax.swing.border.Border;
 
+import ij.gui.Roi;
+import ij.plugin.frame.RoiManager;
 import ij.process.LUT;
 
 /**
@@ -157,6 +159,7 @@ class MontageItem extends JButton implements ActionListener, ItemListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		// TODO Make event handling more concise
 		if (e.getSource() instanceof MenuItem) {
 			MenuItem item = (MenuItem) e.getSource();
 			if (item.getName().equals("clearItem")) {
@@ -172,6 +175,21 @@ class MontageItem extends JButton implements ActionListener, ItemListener {
 		
 		invalidate();
 		repaint();
+	}
+
+	/**
+	 * TODO Documentation
+	 * 
+	 * @return
+	 */
+	private RoiOverlay getRoiOverlay() {
+		for (MontageItemOverlay overlay : overlays) {
+			if (overlay instanceof RoiOverlay) {
+				return (RoiOverlay) overlay;
+			}
+		}
+
+		return null;
 	}
 
 	static class MontagePanelItemBorder implements Border {
@@ -201,9 +219,23 @@ class MontageItem extends JButton implements ActionListener, ItemListener {
 			
 			if (item.getName().equals("roiItem")) {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
+					// TODO Add popup for ROI selection
+					RoiManager roiManager = RoiManager.getRoiManager();
+					if (roiManager.getSelectedIndex() < 0) {
+						// No ROI selected: show all per slice?
+					} else {
+						Roi[] selectedRois = roiManager.getSelectedRoisAsArray();
+						RoiOverlay roiOverlay = getRoiOverlay();
+						
+						roiOverlay.setRois(selectedRois);
+					}
+					
 					enableRoiDrawing();
 					item.setState(true);
 				} else {
+					RoiOverlay roiOverlay = getRoiOverlay();
+					roiOverlay.setRois(null);
+					
 					disableRoiDrawing();
 					item.setState(false);
 				}
@@ -225,7 +257,7 @@ class MontageItem extends JButton implements ActionListener, ItemListener {
 				} else if (e.getStateChange() == ItemEvent.DESELECTED) {
 					overlay.setDrawn(false);
 				}
-			}
+			} 
 			
 			invalidate();
 			repaint();
