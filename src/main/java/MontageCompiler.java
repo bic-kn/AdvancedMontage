@@ -208,7 +208,10 @@ public class MontageCompiler implements ActionListener {
 					Roi[] rois = ((RoiOverlay) itemOverlay).getRois();
 					if (rois == null) {
 						/* The ROIs for each slice are drawn */
-						RoiManager roiManager = RoiManager.getRoiManager();
+						RoiManager roiManager = RoiManager.getInstance();
+						if (roiManager == null) {
+							roiManager = new RoiManager();
+						}
 						Roi[] roisInManager = roiManager.getRoisAsArray();
 						for (Roi roi : roisInManager) {
 							for (MontageItemOverlay itemOverlay2 : item.getOverlays()) {

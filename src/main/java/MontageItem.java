@@ -220,7 +220,11 @@ class MontageItem extends JButton implements ActionListener, ItemListener {
 			if (item.getName().equals("roiItem")) {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
 					// TODO Add popup for ROI selection
-					RoiManager roiManager = RoiManager.getRoiManager();
+					RoiManager roiManager = RoiManager.getInstance();
+					if (roiManager == null) {
+						roiManager = new RoiManager(false);
+					}
+					
 					if (roiManager.getSelectedIndex() < 0) {
 						// No ROI selected: show all per slice?
 					} else {
