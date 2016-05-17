@@ -44,6 +44,15 @@ public class MontageTool extends AbstractTool
 		implements MouseMotionListener, MouseListener, ToolToggleListener,
 		KeyListener, FocusListener, ToolWithOptions {
 
+	/**
+		 * @author stefan
+		 *
+		 */
+	public enum ActiveRoiPreference {
+		ROI,
+		SCALEBAR;
+	}
+
 	private ImagePlus imp;
 
 	private MontageFrame montageFrame; 
@@ -63,6 +72,8 @@ public class MontageTool extends AbstractTool
 	// Padding
 	int paddingWidth = 10;
 	Color paddingColor = Color.WHITE;
+
+	private ActiveRoiPreference activeRoiPreference = ActiveRoiPreference.ROI;
 	
 	/** Tile size in pixels */
 	private static int TILE_SIZE = 20;
@@ -107,6 +118,10 @@ public class MontageTool extends AbstractTool
 		// TODO Implement properly
 //		gd.addMessage("Event Stamp Settings");
 //		gd.addChoice("Position", new String[]{"Lower Right", "Lower Left"}, "Lower Right");
+		
+		// General
+		gd.addMessage("General Settings");
+		gd.addChoice("Active ROI", new String[]{"ROI", "SCALEBAR"}, getActiveRoiPreference().toString());
 		
 		// Scalebar
 		gd.addMessage("Scalebar Settings");
@@ -159,6 +174,10 @@ public class MontageTool extends AbstractTool
 		// TODO Time Stamp
 		
 		// TODO Event Stamp
+		
+		// General
+		String activeRoiPreferenceString = gd.getNextChoice();
+		activeRoiPreference = ActiveRoiPreference.valueOf(activeRoiPreferenceString);
 		
 		// Scalebar
 		fontName = gd.getNextString();
@@ -441,6 +460,15 @@ public class MontageTool extends AbstractTool
 
 		// run the plugin
 		IJ.runPlugIn(clazz.getName(), "");
+	}
+
+	/**
+	 * TODO Documentation
+	 * 
+	 * @return
+	 */
+	public ActiveRoiPreference getActiveRoiPreference() {
+		return activeRoiPreference;
 	}
 	
 }

@@ -195,7 +195,7 @@ public class MontageCompiler implements ActionListener {
 		// TODO Refactor code
 		/* The image has an active ROI */
 		Roi activeRoi = tool.getImp().getRoi();
-		if (activeRoi != null) {
+		if (activeRoi != null && tool.getActiveRoiPreference() == MontageTool.ActiveRoiPreference.ROI) {
 			overlay.add(activeRoi);
 			
 			// TODO Clear the ROIs from the RoiOverlay
