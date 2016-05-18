@@ -1,5 +1,11 @@
 // TODO Insert license header
 
+import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.configuration2.PropertiesConfiguration;
+import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
+import org.apache.commons.configuration2.builder.fluent.Configurations;
+import org.apache.commons.configuration2.ex.ConfigurationException;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.FocusEvent;
@@ -9,6 +15,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
@@ -78,6 +85,39 @@ public class MontageTool extends AbstractTool
 	/** Tile size in pixels */
 	private static int TILE_SIZE = 20;
 	
+	/**
+	 * TODO Documentation
+	 */
+	public MontageTool() {
+		super();
+
+		Configurations configs = new Configurations();
+		try {
+			// TODO Remove hardcoded location
+			Configuration config = configs.properties(new File("/home/stefan/.imagej/Advanced_Montage.properties"));
+
+			// access configuration properties
+			activeRoiPreference = ActiveRoiPreference.valueOf(config.getString("activeRoiPreference", "ROI"));
+
+			fontName = config.getString("scalebar.fontName", "SansSerif");
+			fontSize = config.getInt("scalebar.fontSize", 42);
+
+			scalebarWidth = config.getDouble("scalebar.width", 10.0);
+			scalebarHeight = config.getDouble("scalebar.height", 0.25);
+			scalebarPosition = config.getString("scalebar.position", "Lower Right");
+			scalebarColor = getColor(config.getString("scalebar.color", "white"));
+
+			roiColor = getColor(config.getString("roi.color", "white"));
+
+			paddingWidth = config.getInt("padding.width", 10);
+			paddingColor = getColor(config.getString("padding.color", "white"));
+		} catch (ConfigurationException cex) {
+			// Values that cannot be read are filled with the default values
+			// they have been assigned at declaration anyway.
+			return;
+		}
+	}
+
 	@Override
 	public void run(String arg) {				
 		// getToolId() returns -1 if no tool with the given name is found
@@ -150,6 +190,7 @@ public class MontageTool extends AbstractTool
 		
 		if (!gd.wasCanceled()) {
 			parseOptionsFromDialog(gd);
+			persistOptions();
 		}
 	}
 	
@@ -196,6 +237,40 @@ public class MontageTool extends AbstractTool
 		paddingWidth = (int) Math.floor(gd.getNextNumber());
 		String paddingColorString = gd.getNextChoice();
 		paddingColor = getColor(paddingColorString);
+	}
+
+	/**
+	 * TODO Documentation
+	 */
+	private void persistOptions() {
+		Configurations configs = new Configurations();
+		try {
+			// obtain the configuration
+			FileBasedConfigurationBuilder<PropertiesConfiguration> builder = configs
+					.propertiesBuilder("/home/stefan/.imagej/Advanced_Montage.properties");
+			PropertiesConfiguration config = builder.getConfiguration();
+
+			// update property
+			config.setProperty("activeRoiPreference", activeRoiPreference.toString());
+
+			config.setProperty("scalebar.fontName", fontName);
+			config.setProperty("scalebar.fontSize", fontSize);
+
+			config.setProperty("scalebar.width", scalebarWidth);
+			config.setProperty("scalebar.height", scalebarHeight);
+			config.setProperty("scalebar.position", scalebarPosition);
+			config.setProperty("scalebar.color", getColorName(scalebarColor));
+
+			config.setProperty("roi.color", getColorName(roiColor));
+
+			config.setProperty("padding.width", paddingWidth);
+			config.setProperty("padding.color", getColorName(paddingColor));
+
+			// save configuration
+			builder.save();
+		} catch (ConfigurationException cex) {
+			// Something went wrong
+		}
 	}
 
 	public Collection<MontageItem> getMontageItems() {
