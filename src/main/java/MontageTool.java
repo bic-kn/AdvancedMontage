@@ -1,5 +1,7 @@
 // TODO Insert license header
 
+import org.scijava.prefs.PrefService;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.FocusEvent;
@@ -9,6 +11,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
@@ -25,6 +28,7 @@ import ij.CompositeImage;
 import ij.IJ;
 import ij.ImageJ;
 import ij.ImagePlus;
+import ij.Prefs;
 import ij.WindowManager;
 import ij.gui.GenericDialog;
 import ij.gui.Toolbar;
@@ -57,10 +61,13 @@ public class MontageTool extends AbstractTool
 
 	private MontageFrame montageFrame; 
 	private GenericDialog gd;
-	
+
+	// General
+	private ActiveRoiPreference activeRoiPreference = ActiveRoiPreference.ROI;
+
 	// Scalebar
 	String fontName = "SansSerif";
-	double fontSize = 42;
+	double fontSize = 42.0;
 	double scalebarWidth = 10.0;
 	double scalebarHeight = 0.25;
 	String scalebarPosition = "Lower Right";
@@ -72,12 +79,36 @@ public class MontageTool extends AbstractTool
 	// Padding
 	int paddingWidth = 10;
 	Color paddingColor = Color.WHITE;
-
-	private ActiveRoiPreference activeRoiPreference = ActiveRoiPreference.ROI;
+	
+	private PrefService prefService;
 	
 	/** Tile size in pixels */
 	private static int TILE_SIZE = 20;
 	
+	/**
+	 * TODO Documentation
+	 */
+	public MontageTool(final PrefService prefService) {
+		super();
+
+		this.prefService = prefService;
+		
+		activeRoiPreference = ActiveRoiPreference.valueOf(prefService.get("activeRoiPreference", "ROI"));
+
+		fontName = prefService.get("scalebar.fontName", "SansSerif");
+		fontSize = prefService.getDouble("scalebar.fontSize", 42.0);
+
+		scalebarWidth = prefService.getDouble("scalebar.width", 10.0);
+		scalebarHeight = prefService.getDouble("scalebar.height", 0.25);
+		scalebarPosition = prefService.get("scalebar.position", "Lower Right");
+		scalebarColor = getColor(prefService.get("scalebar.color", "white"));
+
+		roiColor = getColor(prefService.get("roi.color", "white"));
+
+		paddingWidth = prefService.getInt("padding.width", 10);
+		paddingColor = getColor(prefService.get("padding.color", "white"));
+	}
+
 	@Override
 	public void run(String arg) {				
 		// getToolId() returns -1 if no tool with the given name is found
@@ -150,6 +181,7 @@ public class MontageTool extends AbstractTool
 		
 		if (!gd.wasCanceled()) {
 			parseOptionsFromDialog(gd);
+			persistOptions();
 		}
 	}
 	
@@ -196,6 +228,27 @@ public class MontageTool extends AbstractTool
 		paddingWidth = (int) Math.floor(gd.getNextNumber());
 		String paddingColorString = gd.getNextChoice();
 		paddingColor = getColor(paddingColorString);
+	}
+
+	/**
+	 * TODO Documentation
+	 */
+	private void persistOptions() {
+		// update property
+		prefService.put("activeRoiPreference", activeRoiPreference.toString());
+
+		prefService.put("scalebar.fontName", fontName);
+		prefService.put("scalebar.fontSize", fontSize);
+
+		prefService.put("scalebar.width", scalebarWidth);
+		prefService.put("scalebar.height", scalebarHeight);
+		prefService.put("scalebar.position", scalebarPosition);
+		prefService.put("scalebar.color", getColorName(scalebarColor));
+
+		prefService.put("roi.color", getColorName(roiColor));
+
+		prefService.put("padding.width", paddingWidth);
+		prefService.put("padding.color", getColorName(paddingColor));
 	}
 
 	public Collection<MontageItem> getMontageItems() {
@@ -522,6 +575,10 @@ public class MontageTool extends AbstractTool
 	 */
 	public ActiveRoiPreference getActiveRoiPreference() {
 		return activeRoiPreference;
+	}
+
+	public void setPrefService(PrefService prefService) {
+		this.prefService = prefService;
 	}
 	
 }
