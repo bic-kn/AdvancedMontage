@@ -32,6 +32,7 @@ import ij.CompositeImage;
 import ij.IJ;
 import ij.ImageJ;
 import ij.ImagePlus;
+import ij.Prefs;
 import ij.WindowManager;
 import ij.gui.GenericDialog;
 import ij.gui.Toolbar;
@@ -81,6 +82,8 @@ public class MontageTool extends AbstractTool
 	Color paddingColor = Color.WHITE;
 
 	private ActiveRoiPreference activeRoiPreference = ActiveRoiPreference.ROI;
+
+	private String propertiesPath = Prefs.getPrefsDir() + File.separator + "Advanced_Montage.properties";
 	
 	/** Tile size in pixels */
 	private static int TILE_SIZE = 20;
@@ -93,8 +96,7 @@ public class MontageTool extends AbstractTool
 
 		Configurations configs = new Configurations();
 		try {
-			// TODO Remove hardcoded location
-			Configuration config = configs.properties(new File("/home/stefan/.imagej/Advanced_Montage.properties"));
+			Configuration config = configs.properties(new File(propertiesPath));
 
 			// access configuration properties
 			activeRoiPreference = ActiveRoiPreference.valueOf(config.getString("activeRoiPreference", "ROI"));
@@ -247,7 +249,7 @@ public class MontageTool extends AbstractTool
 		try {
 			// obtain the configuration
 			FileBasedConfigurationBuilder<PropertiesConfiguration> builder = configs
-					.propertiesBuilder("/home/stefan/.imagej/Advanced_Montage.properties");
+					.propertiesBuilder(propertiesPath);
 			PropertiesConfiguration config = builder.getConfiguration();
 
 			// update property
