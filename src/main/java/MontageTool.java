@@ -67,7 +67,7 @@ public class MontageTool extends AbstractTool
 	
 	// Scalebar
 	String fontName = "SansSerif";
-	double fontSize = 42;
+	double fontSize = 42.0;
 	double scalebarWidth = 10.0;
 	double scalebarHeight = 0.25;
 	String scalebarPosition = "Lower Right";
@@ -100,7 +100,7 @@ public class MontageTool extends AbstractTool
 			activeRoiPreference = ActiveRoiPreference.valueOf(config.getString("activeRoiPreference", "ROI"));
 
 			fontName = config.getString("scalebar.fontName", "SansSerif");
-			fontSize = config.getInt("scalebar.fontSize", 42);
+			fontSize = config.getDouble("scalebar.fontSize", 42.0);
 
 			scalebarWidth = config.getDouble("scalebar.width", 10.0);
 			scalebarHeight = config.getDouble("scalebar.height", 0.25);
