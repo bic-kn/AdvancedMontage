@@ -1,10 +1,6 @@
 // TODO Insert license header
 
-import org.apache.commons.configuration2.Configuration;
-import org.apache.commons.configuration2.PropertiesConfiguration;
-import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
-import org.apache.commons.configuration2.builder.fluent.Configurations;
-import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.scijava.prefs.PrefService;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -65,7 +61,10 @@ public class MontageTool extends AbstractTool
 
 	private MontageFrame montageFrame; 
 	private GenericDialog gd;
-	
+
+	// General
+	private ActiveRoiPreference activeRoiPreference = ActiveRoiPreference.ROI;
+
 	// Scalebar
 	String fontName = "SansSerif";
 	double fontSize = 42.0;
@@ -80,10 +79,8 @@ public class MontageTool extends AbstractTool
 	// Padding
 	int paddingWidth = 10;
 	Color paddingColor = Color.WHITE;
-
-	private ActiveRoiPreference activeRoiPreference = ActiveRoiPreference.ROI;
-
-	private String propertiesPath = Prefs.getPrefsDir() + File.separator + "Advanced_Montage.properties";
+	
+	private PrefService prefService;
 	
 	/** Tile size in pixels */
 	private static int TILE_SIZE = 20;
@@ -91,33 +88,25 @@ public class MontageTool extends AbstractTool
 	/**
 	 * TODO Documentation
 	 */
-	public MontageTool() {
+	public MontageTool(final PrefService prefService) {
 		super();
 
-		Configurations configs = new Configurations();
-		try {
-			Configuration config = configs.properties(new File(propertiesPath));
+		this.prefService = prefService;
+		
+		activeRoiPreference = ActiveRoiPreference.valueOf(prefService.get("activeRoiPreference", "ROI"));
 
-			// access configuration properties
-			activeRoiPreference = ActiveRoiPreference.valueOf(config.getString("activeRoiPreference", "ROI"));
+		fontName = prefService.get("scalebar.fontName", "SansSerif");
+		fontSize = prefService.getDouble("scalebar.fontSize", 42.0);
 
-			fontName = config.getString("scalebar.fontName", "SansSerif");
-			fontSize = config.getDouble("scalebar.fontSize", 42.0);
+		scalebarWidth = prefService.getDouble("scalebar.width", 10.0);
+		scalebarHeight = prefService.getDouble("scalebar.height", 0.25);
+		scalebarPosition = prefService.get("scalebar.position", "Lower Right");
+		scalebarColor = getColor(prefService.get("scalebar.color", "white"));
 
-			scalebarWidth = config.getDouble("scalebar.width", 10.0);
-			scalebarHeight = config.getDouble("scalebar.height", 0.25);
-			scalebarPosition = config.getString("scalebar.position", "Lower Right");
-			scalebarColor = getColor(config.getString("scalebar.color", "white"));
+		roiColor = getColor(prefService.get("roi.color", "white"));
 
-			roiColor = getColor(config.getString("roi.color", "white"));
-
-			paddingWidth = config.getInt("padding.width", 10);
-			paddingColor = getColor(config.getString("padding.color", "white"));
-		} catch (ConfigurationException cex) {
-			// Values that cannot be read are filled with the default values
-			// they have been assigned at declaration anyway.
-			return;
-		}
+		paddingWidth = prefService.getInt("padding.width", 10);
+		paddingColor = getColor(prefService.get("padding.color", "white"));
 	}
 
 	@Override
@@ -245,34 +234,21 @@ public class MontageTool extends AbstractTool
 	 * TODO Documentation
 	 */
 	private void persistOptions() {
-		Configurations configs = new Configurations();
-		try {
-			// obtain the configuration
-			FileBasedConfigurationBuilder<PropertiesConfiguration> builder = configs
-					.propertiesBuilder(propertiesPath);
-			PropertiesConfiguration config = builder.getConfiguration();
+		// update property
+		prefService.put("activeRoiPreference", activeRoiPreference.toString());
 
-			// update property
-			config.setProperty("activeRoiPreference", activeRoiPreference.toString());
+		prefService.put("scalebar.fontName", fontName);
+		prefService.put("scalebar.fontSize", fontSize);
 
-			config.setProperty("scalebar.fontName", fontName);
-			config.setProperty("scalebar.fontSize", fontSize);
+		prefService.put("scalebar.width", scalebarWidth);
+		prefService.put("scalebar.height", scalebarHeight);
+		prefService.put("scalebar.position", scalebarPosition);
+		prefService.put("scalebar.color", getColorName(scalebarColor));
 
-			config.setProperty("scalebar.width", scalebarWidth);
-			config.setProperty("scalebar.height", scalebarHeight);
-			config.setProperty("scalebar.position", scalebarPosition);
-			config.setProperty("scalebar.color", getColorName(scalebarColor));
+		prefService.put("roi.color", getColorName(roiColor));
 
-			config.setProperty("roi.color", getColorName(roiColor));
-
-			config.setProperty("padding.width", paddingWidth);
-			config.setProperty("padding.color", getColorName(paddingColor));
-
-			// save configuration
-			builder.save();
-		} catch (ConfigurationException cex) {
-			// Something went wrong
-		}
+		prefService.put("padding.width", paddingWidth);
+		prefService.put("padding.color", getColorName(paddingColor));
 	}
 
 	public Collection<MontageItem> getMontageItems() {
@@ -599,6 +575,10 @@ public class MontageTool extends AbstractTool
 	 */
 	public ActiveRoiPreference getActiveRoiPreference() {
 		return activeRoiPreference;
+	}
+
+	public void setPrefService(PrefService prefService) {
+		this.prefService = prefService;
 	}
 	
 }

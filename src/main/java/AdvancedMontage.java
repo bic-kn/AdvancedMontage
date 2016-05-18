@@ -4,6 +4,7 @@ import org.scijava.command.Command;
 import org.scijava.convert.ConvertService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+import org.scijava.prefs.PrefService;
 
 import net.imagej.Dataset;
 import net.imagej.ImageJ;
@@ -24,6 +25,9 @@ public class AdvancedMontage implements Command {
 	@Parameter
     private ConvertService convertService;
 	
+	@Parameter
+	private PrefService prefService;
+	
 	/** TODO Documentation */
 	private MontageFrame montageFrame;
 	
@@ -33,7 +37,7 @@ public class AdvancedMontage implements Command {
 	@Override
 	public void run() {
 		if (tool == null) {
-			tool = new MontageTool();
+			tool = new MontageTool(prefService);
 		}
 		tool.setImp(dataset);
 
