@@ -1,8 +1,11 @@
 // TODO Missing license header
 
 import java.awt.Color;
+import java.awt.ItemSelectable;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.LinkedList;
+import java.util.List;
 
 import ij.ImagePlus;
 import ij.plugin.Colors;

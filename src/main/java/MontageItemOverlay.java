@@ -1,6 +1,11 @@
 import java.awt.Color;
 
-public abstract class MontageItemOverlay {
+/**
+ * TODO Documentation
+ * 
+ * @author Stefan Helfrich (University of Konstanz)
+ */
+public abstract class MontageItemOverlay implements OverlayListenable {
 	
 	private Color color;
 	private boolean drawn = false;
@@ -23,6 +28,7 @@ public abstract class MontageItemOverlay {
 
 	public void setDrawn(boolean drawn) {
 		this.drawn = drawn;
+		listeners.forEach(l -> l.overlayChanged(new OverlayChangeEvent(this) { /* NB */ }));
 	}
-	
+
 }
