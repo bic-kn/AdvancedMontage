@@ -121,10 +121,12 @@ public class MontageCompiler implements ActionListener {
 		ImageStack stack = new ImageStack(inputWidth, inputHeight);
 		for (MontageItemOverlay overlay : item.getOverlays()) {
 			if (overlay instanceof ChannelOverlay && overlay.isDrawn()) {
-				ImageProcessor channelImageProcessor = extractChannelFromInput((ChannelOverlay) overlay);
-				channelImageProcessor.setLut(availableLuts[((ChannelOverlay) overlay).getChannel()-1]);
+				ChannelOverlay channelOverlay = (ChannelOverlay) overlay;
+				ImagePlus overlayImp = channelOverlay.getImp();
+				ImageProcessor channelImageProcessor = extractImageProcessor(overlayImp, channelOverlay);
+				channelImageProcessor.setLut(availableLuts[((ChannelOverlay) overlay).getChannel()]);
 				stack.addSlice(channelImageProcessor);
-				usedLuts.add(availableLuts[((ChannelOverlay) overlay).getChannel()-1]);
+				usedLuts.add(availableLuts[((ChannelOverlay) overlay).getChannel()]);
 			}
 		}
 		ImagePlus tempImp = new ImagePlus("Composite Temp", stack);
@@ -244,9 +246,9 @@ public class MontageCompiler implements ActionListener {
 	 * @param overlay
 	 * @return
 	 */
-	private ImageProcessor extractChannelFromInput(ChannelOverlay overlay) {
-		ImageStack stack = tool.getImp().getStack();
-		return stack.getProcessor(overlay.getChannel());
+	private ImageProcessor extractImageProcessor(final ImagePlus imp, ChannelOverlay overlay) {
+		ImageStack stack = imp.getStack();
+		return stack.getProcessor(overlay.getChannel()+1);
 	}
 
 	int numberOfOutputColumns(Collection<MontageItem> montageItems) {
