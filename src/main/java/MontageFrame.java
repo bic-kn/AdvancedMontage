@@ -17,7 +17,7 @@ import javax.swing.WindowConstants;
  * 
  * @author Stefan Helfrich (University of Konstanz)
  */
-public class MontageFrame extends JFrame implements ActionListener, ComponentListener {      
+public class MontageFrame extends JFrame implements ActionListener {
 	
 	MontagePanel panel;
 	JButton compileButton;
@@ -42,8 +42,6 @@ public class MontageFrame extends JFrame implements ActionListener, ComponentLis
 		setVisible(true);
 		
 		panel.setSnapSize();
-		
-		addComponentListener(this);
 	}
 	
 	/**
@@ -66,19 +64,5 @@ public class MontageFrame extends JFrame implements ActionListener, ComponentLis
 	public MontagePanel getPanel() {
 		return panel;
 	}
-
-	@Override
-	public void componentResized(ComponentEvent e) {
-		panel.setSnapSize();
-	}
-
-	@Override
-	public void componentMoved(ComponentEvent e) { /* NB */	}
-
-	@Override
-	public void componentShown(ComponentEvent e) { /* NB */	}
-
-	@Override
-	public void componentHidden(ComponentEvent e) { /* NB */ }
 	
 }
