@@ -65,7 +65,7 @@ public class AdvancedMontage implements Command {
 		final ImageJ ij = net.imagej.Main.launch(args);
 		
 		final Dataset dataset1 = (Dataset) ij.io().open("/home/stefan/Dropbox/Konstanz/Chovancova/cell_seg_max_proj.tif");
-		final Dataset dataset2 = (Dataset) ij.io().open("/home/stefan/Dropbox/Konstanz/Chovancova/cell_seg_max_proj.tif");
+		final Dataset dataset2 = (Dataset) ij.io().open("/home/stefan/Pictures/hela-cells.tif");
 		ij.ui().show(dataset1);
 		ij.ui().show(dataset2);
 		

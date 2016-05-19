@@ -42,7 +42,7 @@ public class MontagePanel extends JPanel {
 			
 			// Add channels
 			for (int c = 0; c < tool.getImp().getNChannels(); c++) {
-				ChannelOverlay defaultChannelOverlay = new ChannelOverlay(tool.getColorForChannel(c+1), c+1);
+				ChannelOverlay defaultChannelOverlay = new ChannelOverlay(tool.getImp(), c);
 				defaultOverlays.add(defaultChannelOverlay);
 			}
 			

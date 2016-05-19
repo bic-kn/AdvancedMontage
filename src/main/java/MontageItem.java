@@ -251,17 +251,7 @@ class MontageItem extends JButton implements ActionListener, ItemListener {
 					disableScalebarDrawing();
 					item.setState(false);
 				}
-			} else {
-				// TODO Handle exceptions / improve in general
-				String[] splitName = item.getName().split("-");
-				MontageItemOverlay overlay = overlayForChannel(Integer.parseInt(splitName[1])-1);
-				
-				if (e.getStateChange() == ItemEvent.SELECTED) {					
-					overlay.setDrawn(true);
-				} else if (e.getStateChange() == ItemEvent.DESELECTED) {
-					overlay.setDrawn(false);
-				}
-			} 
+			}
 			
 			invalidate();
 			repaint();

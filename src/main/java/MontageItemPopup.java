@@ -42,18 +42,17 @@ class MontageItemPopup extends PopupMenu {
 			
 			// For all available channels in the image
 			List<CheckboxMenuItem> channelItems = new ArrayList<>();
-			int i = 1;
-			for (LUT lut : tool.getAvailableLuts(imp)) {
-				// TODO Check if an overlay exists for that LUT
-				CheckboxMenuItem channelItem = new CheckboxMenuItem(MontageUtil.getLUTName(lut, i),
-						item.overlaysContain(lut) ? true : false);
-				if (item.overlayForChannel(i-1).isDrawn()) {
-					channelItem.setState(true);
+			for (MontageItemOverlay itemOverlay : item.getOverlays()) {
+				if (itemOverlay instanceof ChannelOverlay) {
+					ChannelOverlay channelOverlay = (ChannelOverlay) itemOverlay;
+					if (channelOverlay.getImp() == imp) {
+						CheckboxMenuItem channelItem = new CheckboxMenuItem(channelOverlay.getNameForPopup(),
+								channelOverlay.isDrawn());
+						channelItems.add(channelItem);
+						channelItem.addItemListener(channelOverlay);
+						impMenu.add(channelItem);
+					}
 				}
-				channelItems.add(channelItem);
-				channelItem.setName("channel-"+i++);
-				channelItem.addItemListener(item);
-				impMenu.add(channelItem);
 			}
 			menuItems.put(impMenu, channelItems);
 			
