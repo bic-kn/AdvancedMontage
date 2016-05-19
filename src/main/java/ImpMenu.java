@@ -3,6 +3,8 @@ import java.awt.Menu;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
+import javax.swing.JMenu;
+
 /**
  * 
  */
@@ -11,7 +13,7 @@ import java.awt.event.ItemListener;
  * @author stefan
  *
  */
-public class ImpMenu extends Menu implements ItemListener {
+public class ImpMenu extends JMenu implements ItemListener {
 
 	/**
 	 * @throws HeadlessException

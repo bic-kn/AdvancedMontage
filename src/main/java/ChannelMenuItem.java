@@ -3,12 +3,14 @@
 import java.awt.CheckboxMenuItem;
 import java.awt.HeadlessException;
 
+import javax.swing.JCheckBoxMenuItem;
+
 /**
  * TODO Documentation
  * 
  * @author Stefan Helfrich (University of Konstanz)
  */
-public class ChannelMenuItem extends CheckboxMenuItem implements OverlayListener {
+public class ChannelMenuItem extends JCheckBoxMenuItem implements OverlayListener {
 
 	/**
 	 * @throws HeadlessException

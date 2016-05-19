@@ -11,10 +11,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+
 import ij.ImagePlus;
 import ij.process.LUT;
 
-class MontageItemPopup extends PopupMenu implements ItemListener {
+class MontageItemPopup extends JPopupMenu implements ItemListener {
 
 	private MontageTool tool;
 	
@@ -25,16 +30,17 @@ class MontageItemPopup extends PopupMenu implements ItemListener {
 	}
 
 	private MontageItem item;
-	private MenuItem clearItem;
-	private MenuItem compositeItem;
-	private CheckboxMenuItem roiItem;
-	private CheckboxMenuItem scalebarItem;
-	private Map<Menu, List<CheckboxMenuItem>> menuItems = new HashMap<>();
 
+	private JMenuItem clearItem;
+	private JMenuItem compositeItem;
+	private JCheckBoxMenuItem roiItem;
+	private JCheckBoxMenuItem scalebarItem;
+	private Map<JMenu, List<JCheckBoxMenuItem>> menuItems = new HashMap<>();
+	
 	public void init() {
 		this.item = (MontageItem) getParent();
 
-		clearItem = new MenuItem("Clear");
+		clearItem = new JMenuItem("Clear");
 		clearItem.setName("clearItem");
 		clearItem.addActionListener(item);
 		this.add(clearItem);
@@ -44,7 +50,7 @@ class MontageItemPopup extends PopupMenu implements ItemListener {
 			this.add(impMenu);
 			
 			// For all available channels in the image
-			List<CheckboxMenuItem> channelItems = new ArrayList<>();
+			List<JCheckBoxMenuItem> channelItems = new ArrayList<>();
 			for (MontageItemOverlay itemOverlay : item.getOverlays()) {
 				if (itemOverlay instanceof ChannelOverlay) {
 					ChannelOverlay channelOverlay = (ChannelOverlay) itemOverlay;
@@ -65,18 +71,18 @@ class MontageItemPopup extends PopupMenu implements ItemListener {
 			}
 			menuItems.put(impMenu, channelItems);
 			
-			compositeItem = new MenuItem("Composite");
+			compositeItem = new JMenuItem("Composite");
 			compositeItem.setName("compositeItem");
 			compositeItem.addActionListener(item);
 			impMenu.add(compositeItem);
 		}
 
-		roiItem = new CheckboxMenuItem("ROI", false);
+		roiItem = new JCheckBoxMenuItem("ROI", false);
 		roiItem.setName("roiItem");
 		roiItem.addItemListener(item);
 		this.add(roiItem);
 
-		scalebarItem = new CheckboxMenuItem("Scalebar", false);
+		scalebarItem = new JCheckBoxMenuItem("Scalebar", false);
 		scalebarItem.setName("scalebarItem");
 		scalebarItem.addItemListener(item);
 		this.add(scalebarItem);
@@ -93,8 +99,8 @@ class MontageItemPopup extends PopupMenu implements ItemListener {
 	}
 
 	private void clearChannels() {
-		for (Entry<Menu, List<CheckboxMenuItem>> entry : menuItems.entrySet()) {
-			for (CheckboxMenuItem channelItem : entry.getValue()) {
+		for (Entry<JMenu, List<JCheckBoxMenuItem>> entry : menuItems.entrySet()) {
+			for (JCheckBoxMenuItem channelItem : entry.getValue()) {
 				channelItem.setState(false);
 			}
 		}
@@ -109,8 +115,8 @@ class MontageItemPopup extends PopupMenu implements ItemListener {
 	}
 
 	public void composite() {
-		for (Entry<Menu, List<CheckboxMenuItem>> entry : menuItems.entrySet()) {
-			for (CheckboxMenuItem channelItem : entry.getValue()) {
+		for (Entry<JMenu, List<JCheckBoxMenuItem>> entry : menuItems.entrySet()) {
+			for (JCheckBoxMenuItem channelItem : entry.getValue()) {
 				channelItem.setState(true);
 			}
 		}
@@ -119,7 +125,7 @@ class MontageItemPopup extends PopupMenu implements ItemListener {
 	/**
 	 * @return the menuItems
 	 */
-	private Map<Menu, List<CheckboxMenuItem>> getMenuItems() {
+	private Map<JMenu, List<JCheckBoxMenuItem>> getMenuItems() {
 		return menuItems;
 	}
 
@@ -132,8 +138,8 @@ class MontageItemPopup extends PopupMenu implements ItemListener {
 				disableOtherSubmenus(checkbox);
 			} else if (e.getStateChange() == ItemEvent.DESELECTED) {
 				// TODO Refactor!
-				for (Entry<Menu, List<CheckboxMenuItem>> entry : getMenuItems().entrySet()) {
-					List<CheckboxMenuItem> items = entry.getValue();
+				for (Entry<JMenu, List<JCheckBoxMenuItem>> entry : getMenuItems().entrySet()) {
+					List<JCheckBoxMenuItem> items = entry.getValue();
 					if (items.contains(checkbox)) {
 						if (items.stream().noneMatch(x -> x.getState()==true)) {
 							enableOtherSubmenus(checkbox);
@@ -151,7 +157,7 @@ class MontageItemPopup extends PopupMenu implements ItemListener {
 	 * @param checkbox
 	 */
 	private void enableOtherSubmenus(CheckboxMenuItem checkbox) {
-		for (Entry<Menu, List<CheckboxMenuItem>> entry : getMenuItems().entrySet()) {
+		for (Entry<JMenu, List<JCheckBoxMenuItem>> entry : getMenuItems().entrySet()) {
 			if (!entry.getValue().contains(checkbox)) {
 				entry.getKey().setEnabled(true);
 			}
@@ -165,7 +171,7 @@ class MontageItemPopup extends PopupMenu implements ItemListener {
 	 * @param checkbox
 	 */
 	private void disableOtherSubmenus(CheckboxMenuItem checkbox) {
-		for (Entry<Menu, List<CheckboxMenuItem>> entry : getMenuItems().entrySet()) {
+		for (Entry<JMenu, List<JCheckBoxMenuItem>> entry : getMenuItems().entrySet()) {
 			if (!entry.getValue().contains(checkbox)) {
 				entry.getKey().setEnabled(false);
 			}
