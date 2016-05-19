@@ -7,6 +7,8 @@ import java.util.List;
 
 import javax.swing.JPanel;
 
+import ij.ImagePlus;
+
 /**
  * TODO Documentation
  * 
@@ -35,17 +37,26 @@ public class MontagePanel extends JPanel {
 		this.setLayout(new GridLayout(ROWS,COLUMNS));
 
 		int numberOfChannels = tool.getImp().getNChannels();
-		
+
 		cm = new ComponentMover();
 		for (int i=0; i<ROWS*COLUMNS; i++) {
 			List<MontageItemOverlay> defaultOverlays = new ArrayList<>();
-			
+
 			// Add channels
-			for (int c = 0; c < tool.getImp().getNChannels(); c++) {
-				ChannelOverlay defaultChannelOverlay = new ChannelOverlay(tool.getImp(), c);
-				defaultOverlays.add(defaultChannelOverlay);
+			for (ImagePlus imp : tool.getImps()) {
+				for (int c = 0; c < imp.getNChannels(); c++) {
+					ChannelOverlay defaultChannelOverlay = new ChannelOverlay(imp, c);
+					defaultOverlays.add(defaultChannelOverlay);
+
+					// Set the defaults according to the active image (i.e. tool.getImp())
+					if (imp == tool.getImp()) {
+						if (i == c || i == numberOfChannels) {
+							defaultChannelOverlay.setDrawn(true);
+						}
+					}
+				}
 			}
-			
+
 			// Add ROI
 			RoiOverlay roiOverlay = new RoiOverlay();
 			defaultOverlays.add(roiOverlay);
@@ -56,16 +67,6 @@ public class MontagePanel extends JPanel {
 			
 			MontageItem item = new MontageItem(tool, defaultOverlays);
 
-			if (i < numberOfChannels) {
-				// Only one channel at the position
-				defaultOverlays.get(i).setDrawn(true);
-			} else if (i == numberOfChannels) {
-				// Composite
-				for (int j=0; j<numberOfChannels; j++) {
-					defaultOverlays.get(j).setDrawn(true);
-				}
-			}
-			
 			this.add(item);
 			cm.registerComponent(item);
 		}
