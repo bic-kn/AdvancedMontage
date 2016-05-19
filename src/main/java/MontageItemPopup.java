@@ -3,7 +3,10 @@ import java.awt.Menu;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import ij.ImagePlus;
 import ij.process.LUT;
@@ -23,7 +26,7 @@ class MontageItemPopup extends PopupMenu {
 	private MenuItem compositeItem;
 	private CheckboxMenuItem roiItem;
 	private CheckboxMenuItem scalebarItem;
-	private List<CheckboxMenuItem> channelItems;
+	private Map<Menu, List<CheckboxMenuItem>> menuItems = new HashMap<>();
 	
 	public void init() {
 		this.item = (MontageItem) getParent();
@@ -33,13 +36,12 @@ class MontageItemPopup extends PopupMenu {
 		clearItem.addActionListener(item);
 		this.add(clearItem);
 
-		// TODO Add submenu for each open image
 		for (ImagePlus imp : tool.getImps()) {
 			Menu impMenu = new Menu(imp.getTitle());
 			this.add(impMenu);
 			
 			// For all available channels in the image
-			channelItems = new ArrayList<>();
+			List<CheckboxMenuItem> channelItems = new ArrayList<>();
 			int i = 1;
 			for (LUT lut : tool.getAvailableLuts(imp)) {
 				// TODO Check if an overlay exists for that LUT
@@ -53,6 +55,7 @@ class MontageItemPopup extends PopupMenu {
 				channelItem.addItemListener(item);
 				impMenu.add(channelItem);
 			}
+			menuItems.put(impMenu, channelItems);
 			
 			compositeItem = new MenuItem("Composite");
 			compositeItem.setName("compositeItem");
@@ -82,8 +85,10 @@ class MontageItemPopup extends PopupMenu {
 	}
 
 	private void clearChannels() {
-		for (CheckboxMenuItem channelItem : channelItems) {
-			channelItem.setState(false);
+		for (Entry<Menu, List<CheckboxMenuItem>> entry : menuItems.entrySet()) {
+			for (CheckboxMenuItem channelItem : entry.getValue()) {
+				channelItem.setState(false);
+			}
 		}
 	}
 	
@@ -96,8 +101,10 @@ class MontageItemPopup extends PopupMenu {
 	}
 
 	public void composite() {
-		for (CheckboxMenuItem channelItem : channelItems) {
-			channelItem.setState(true);
+		for (Entry<Menu, List<CheckboxMenuItem>> entry : menuItems.entrySet()) {
+			for (CheckboxMenuItem channelItem : entry.getValue()) {
+				channelItem.setState(true);
+			}
 		}
 	}
 }
