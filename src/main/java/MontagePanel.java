@@ -2,6 +2,8 @@
 
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,17 +14,23 @@ import javax.swing.JPanel;
  * 
  * @author Stefan Helfrich (University of Konstanz)
  */
-public class MontagePanel extends JPanel {
+public class MontagePanel extends JPanel implements ComponentListener {
 
 	private final static int ROWS = 4;
 	private final static int COLUMNS = 4;
 	private MontageTool tool;
-	ComponentMover cm;
+	private ComponentMover cm;
+	
+	// TODO Get correct initial sizes
+	private int tileWidth = 40;
+	private int tileHeight = 30;
 	
 	public MontagePanel(MontageTool tool) {
 		this.tool = tool;
 		
 		placeComponents();
+		
+		addComponentListener(this);
 	}
 	
 	/**
@@ -38,27 +46,12 @@ public class MontagePanel extends JPanel {
 		
 		cm = new ComponentMover();
 		for (int i=0; i<ROWS*COLUMNS; i++) {
-			List<MontageItemOverlay> defaultOverlays = new ArrayList<>();
+			MontageItem item = createMontageItem();
+			List<MontageItemOverlay> defaultOverlays = item.getOverlays();
 			
-			// Add channels
-			for (int c = 0; c < tool.getImp().getNChannels(); c++) {
-				ChannelOverlay defaultChannelOverlay = new ChannelOverlay(tool.getColorForChannel(c+1), c+1);
-				defaultOverlays.add(defaultChannelOverlay);
-			}
-			
-			// Add ROI
-			RoiOverlay roiOverlay = new RoiOverlay();
-			defaultOverlays.add(roiOverlay);
-			
-			// Add scalebar
-			ScalebarOverlay scaleOverlay = new ScalebarOverlay();
-			defaultOverlays.add(scaleOverlay);
-			
-			MontageItem item = new MontageItem(tool, defaultOverlays);
-
 			if (i < numberOfChannels) {
 				// Only one channel at the position
-				defaultOverlays.get(i).setDrawn(true);
+				defaultOverlays .get(i).setDrawn(true);
 			} else if (i == numberOfChannels) {
 				// Composite
 				for (int j=0; j<numberOfChannels; j++) {
@@ -74,4 +67,55 @@ public class MontagePanel extends JPanel {
 	public void setSnapSize() {
 		cm.setSnapSize(new Dimension(getComponents()[0].getWidth(), getComponents()[0].getHeight()));
 	}
+	
+	private MontageItem createMontageItem() {
+		List<MontageItemOverlay> defaultOverlays = new ArrayList<>();
+		
+		// Add channels
+		for (int c = 0; c < tool.getImp().getNChannels(); c++) {
+			ChannelOverlay defaultChannelOverlay = new ChannelOverlay(tool.getColorForChannel(c+1), c+1);
+			defaultOverlays.add(defaultChannelOverlay);
+		}
+		
+		// Add ROI
+		RoiOverlay roiOverlay = new RoiOverlay();
+		defaultOverlays.add(roiOverlay);
+		
+		// Add scalebar
+		ScalebarOverlay scaleOverlay = new ScalebarOverlay();
+		defaultOverlays.add(scaleOverlay);
+		
+		return new MontageItem(tool, defaultOverlays);
+	}
+	
+	@Override
+	public void componentResized(ComponentEvent e) {
+		setSnapSize();
+		
+		int tilesInRow = getWidth() / tileWidth;
+		int tilesInColumn = getHeight() / tileHeight;
+
+		while (getComponentCount() < tilesInColumn * tilesInRow) {
+			this.add(createMontageItem());
+		}
+		
+		while (getComponentCount() > tilesInColumn * tilesInRow) {
+			this.remove(getComponentCount()-1);
+		}
+		
+		GridLayout newLayout = new GridLayout(tilesInColumn, tilesInRow);
+		this.setLayout(newLayout);
+	}
+
+	@Override
+	public void componentMoved(ComponentEvent e) { /* NB */	}
+
+	@Override
+	public void componentShown(ComponentEvent e) {
+		tileWidth = getComponents()[0].getWidth();
+		tileHeight = getComponents()[0].getHeight();
+	}
+
+	@Override
+	public void componentHidden(ComponentEvent e) { /* NB */ }
 }
