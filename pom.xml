@@ -13,7 +13,7 @@
 	</parent>
 
 	<artifactId>Advanced_Montage</artifactId>
-	<version>0.3.2-SNAPSHOT</version>
+	<version>0.3.2</version>
 
 	<name>plugins/Advanced_Montage.jar</name>
 	<description>A plugin with advanced functionality for montage creation. Borrows ideas from Make_Montage as well as the Magic Montage macro toolset.</description>
