@@ -107,24 +107,27 @@ public class MontageCompiler implements ActionListener {
 	 * @param outputImp
 	 */
 	private void compileItem(MontageItem item, ImagePlus outputImp) {
-		int inputWidth = tool.getImp().getWidth();
-		int inputHeight = tool.getImp().getHeight();
-		
 		if (!item.hasDrawnOverlay()) {
 			return;
 		}
-		
+
 		LUT[] availableLuts = tool.getAvailableLuts();
 		List<LUT> usedLuts = new ArrayList<>();
-		
+
 		// Create composite from ChannelOverlays
-		ImageStack stack = new ImageStack(inputWidth, inputHeight);
+		ImageStack stack = null;
 		for (MontageItemOverlay overlay : item.getOverlays()) {
 			if (overlay instanceof ChannelOverlay && overlay.isDrawn()) {
-				ImageProcessor channelImageProcessor = extractChannelFromInput((ChannelOverlay) overlay);
-				channelImageProcessor.setLut(availableLuts[((ChannelOverlay) overlay).getChannel()-1]);
+				ChannelOverlay channelOverlay = (ChannelOverlay) overlay;
+				ImagePlus overlayImp = channelOverlay.getImp();
+				ImageProcessor channelImageProcessor = extractImageProcessor(overlayImp, channelOverlay);
+				channelImageProcessor.setLut(availableLuts[channelOverlay.getChannel()]);
+				
+				if (stack == null) {
+					stack = new ImageStack(overlayImp.getWidth(), overlayImp.getHeight());
+				}
 				stack.addSlice(channelImageProcessor);
-				usedLuts.add(availableLuts[((ChannelOverlay) overlay).getChannel()-1]);
+				usedLuts.add(availableLuts[channelOverlay.getChannel()]);
 			}
 		}
 		ImagePlus tempImp = new ImagePlus("Composite Temp", stack);
@@ -164,8 +167,8 @@ public class MontageCompiler implements ActionListener {
 		}
 		
 		ImageRoi flattenedImpRoi = new ImageRoi(
-				item.getColumn() * inputWidth + item.getColumn() * tool.getPaddingWidth(),
-				item.getRow() * inputHeight + item.getRow() * tool.getPaddingWidth(), flattenedImp.getProcessor());
+				item.getColumn() * stack.getWidth() + item.getColumn() * tool.getPaddingWidth(),
+				item.getRow() * stack.getHeight() + item.getRow() * tool.getPaddingWidth(), flattenedImp.getProcessor());
 		
 		// NB: The sequence of adding to the overlay determines the arrangement
 		outputImpOverlay.add(flattenedImpRoi);
@@ -244,9 +247,9 @@ public class MontageCompiler implements ActionListener {
 	 * @param overlay
 	 * @return
 	 */
-	private ImageProcessor extractChannelFromInput(ChannelOverlay overlay) {
-		ImageStack stack = tool.getImp().getStack();
-		return stack.getProcessor(overlay.getChannel());
+	private ImageProcessor extractImageProcessor(final ImagePlus imp, ChannelOverlay overlay) {
+		ImageStack stack = imp.getStack();
+		return stack.getProcessor(overlay.getChannel()+1);
 	}
 
 	int numberOfOutputColumns(Collection<MontageItem> montageItems) {

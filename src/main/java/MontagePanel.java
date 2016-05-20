@@ -9,6 +9,8 @@ import java.util.List;
 
 import javax.swing.JPanel;
 
+import ij.ImagePlus;
+
 /**
  * TODO Documentation
  * 
@@ -43,24 +45,65 @@ public class MontagePanel extends JPanel implements ComponentListener {
 		this.setLayout(new GridLayout(ROWS,COLUMNS));
 
 		int numberOfChannels = tool.getImp().getNChannels();
-		
+
 		cm = new ComponentMover();
 		for (int i=0; i<ROWS*COLUMNS; i++) {
-			MontageItem item = createMontageItem();
-			List<MontageItemOverlay> defaultOverlays = item.getOverlays();
-			
-			if (i < numberOfChannels) {
-				// Only one channel at the position
-				defaultOverlays .get(i).setDrawn(true);
-			} else if (i == numberOfChannels) {
-				// Composite
-				for (int j=0; j<numberOfChannels; j++) {
-					defaultOverlays.get(j).setDrawn(true);
+			List<MontageItemOverlay> defaultOverlays = new ArrayList<>();
+
+			// Add channels
+			for (ImagePlus imp : tool.getImps()) {
+				for (int c = 0; c < imp.getNChannels(); c++) {
+					ChannelOverlay defaultChannelOverlay = new ChannelOverlay(imp, c);
+					defaultOverlays.add(defaultChannelOverlay);
 				}
 			}
+
+			// Add ROI
+			RoiOverlay roiOverlay = new RoiOverlay();
+			defaultOverlays.add(roiOverlay);
 			
+			// Add scalebar
+			ScalebarOverlay scaleOverlay = new ScalebarOverlay();
+			defaultOverlays.add(scaleOverlay);
+			
+			MontageItem item = new MontageItem(tool, defaultOverlays);
+			MontageItemPopup montageItemPopup = new MontageItemPopup(item, tool);
+			item.setMenu(montageItemPopup);
+
+			// Defaults: initialize each channel individually plus a composite
+			if (i <= numberOfChannels) {
+				initializeOverlay(i, numberOfChannels, defaultOverlays);
+			}
+
 			this.add(item);
 			cm.registerComponent(item);
+		}
+	}
+
+	/**
+	 * TODO Documentation
+	 * 
+	 * @param tileId
+	 * @param numberOfChannels
+	 * @param defaultOverlays
+	 */
+	private void initializeOverlay(int tileId, int numberOfChannels,
+			List<MontageItemOverlay> defaultOverlays) {
+		for (MontageItemOverlay itemOverlay : defaultOverlays) {
+			if (itemOverlay instanceof ChannelOverlay) {
+				ChannelOverlay channelOverlay = (ChannelOverlay) itemOverlay;
+				// Use the active window (tool.getImp()) for defauls
+				if (channelOverlay.getImp() == tool.getImp()) {
+					if (tileId < numberOfChannels && channelOverlay.getChannel() == tileId) {
+						// Draw exactly one channel
+						channelOverlay.setDrawn(true);
+						break;
+					} else if (tileId == numberOfChannels && channelOverlay.getChannel() < numberOfChannels) {
+						// In the composite tile, all available channels are drawn
+						channelOverlay.setDrawn(true);
+					}
+				}
+			}
 		}
 	}
 

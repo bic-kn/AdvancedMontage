@@ -1,14 +1,10 @@
 // TODO Missing license header
 
-import java.awt.CheckboxMenuItem;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Insets;
-import java.awt.MenuItem;
 import java.awt.Point;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
@@ -18,6 +14,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.border.Border;
 
 import ij.gui.Roi;
@@ -29,7 +26,7 @@ import ij.process.LUT;
  * 
  * @author Stefan Helfrich (University of Konstanz)
  */
-class MontageItem extends JButton implements ActionListener, ItemListener {
+class MontageItem extends JButton implements ItemListener {
 
 	private List<MontageItemOverlay> overlays = new ArrayList<>();
 	private MontageItemPopup menu;
@@ -48,59 +45,31 @@ class MontageItem extends JButton implements ActionListener, ItemListener {
 		this.setContentAreaFilled(false);
 		this.setBorderPainted(true);
 		this.setBorder(new MontagePanelItemBorder());
-		
-		addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// Show popup menu
-				// MontageItemPopup menu = new MontageItemPopup();
-				// menu.show(e.getComponent(), e.getX(), e.getY());
-
-				// Somehow get available channels
-
-				// Add composite
-			}
-
-		});
 
 		addMouseListener(new MouseListener() {
 
 			@Override
-			public void mouseClicked(MouseEvent e) {
-			}
+			public void mouseClicked(MouseEvent e) { /* Not used */ }
 
 			@Override
 			public void mousePressed(MouseEvent e) {
 				if (e.isPopupTrigger()) {
-					doPop(e);
+					if (!menu.isInitialized()) {
+						add(menu);
+					}
+
+					menu.show(e.getComponent(), e.getX(), e.getY());
 				}
 			}
 
 			@Override
-			public void mouseReleased(MouseEvent e) {
-				if (e.isPopupTrigger()) {
-					doPop(e);
-				}
-			}
-
-			private void doPop(MouseEvent e) {
-				if (menu == null) {
-					menu = new MontageItemPopup(tool);
-					add(menu);
-					menu.init();
-				}
-				
-				menu.show(e.getComponent(), e.getX(), e.getY());
-			}
+			public void mouseReleased(MouseEvent e) { /* Not used */ }
 
 			@Override
-			public void mouseEntered(MouseEvent e) {
-			}
+			public void mouseEntered(MouseEvent e) { /* Not used */ }
 
 			@Override
-			public void mouseExited(MouseEvent e) {
-			}
+			public void mouseExited(MouseEvent e) { /* Not used */ }
 
 		});
 	}
@@ -157,26 +126,6 @@ class MontageItem extends JButton implements ActionListener, ItemListener {
 		return false;
 	}
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		// TODO Make event handling more concise
-		if (e.getSource() instanceof MenuItem) {
-			MenuItem item = (MenuItem) e.getSource();
-			if (item.getName().equals("clearItem")) {
-				overlays.forEach(overlay -> overlay.setDrawn(false));
-				menu.clearMenu();
-			} else if (item.getName().equals("compositeItem")) {
-				for (int i = 0; i < tool.getImp().getNChannels(); i++) {
-					overlays.get(i).setDrawn(true);
-				}
-				menu.composite();
-			}
-		}
-		
-		invalidate();
-		repaint();
-	}
-
 	/**
 	 * TODO Documentation
 	 * 
@@ -214,8 +163,8 @@ class MontageItem extends JButton implements ActionListener, ItemListener {
 
 	@Override
 	public void itemStateChanged(ItemEvent e) {
-		if (e.getSource() instanceof CheckboxMenuItem) {
-			CheckboxMenuItem item = (CheckboxMenuItem) e.getSource();
+		if (e.getSource() instanceof JCheckBoxMenuItem) {
+			JCheckBoxMenuItem item = (JCheckBoxMenuItem) e.getSource();
 			
 			if (item.getName().equals("roiItem")) {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
@@ -251,17 +200,7 @@ class MontageItem extends JButton implements ActionListener, ItemListener {
 					disableScalebarDrawing();
 					item.setState(false);
 				}
-			} else {
-				// TODO Handle exceptions / improve in general
-				String[] splitName = item.getName().split("-");
-				MontageItemOverlay overlay = overlayForChannel(Integer.parseInt(splitName[1])-1);
-				
-				if (e.getStateChange() == ItemEvent.SELECTED) {					
-					overlay.setDrawn(true);
-				} else if (e.getStateChange() == ItemEvent.DESELECTED) {
-					overlay.setDrawn(false);
-				}
-			} 
+			}
 			
 			invalidate();
 			repaint();
@@ -402,6 +341,13 @@ class MontageItem extends JButton implements ActionListener, ItemListener {
 	 */
 	public boolean hasDrawnOverlay() {
 		return overlays.stream().anyMatch(o -> o.isDrawn());
+	}
+
+	/**
+	 * @param menu the menu to set
+	 */
+	public void setMenu(MontageItemPopup menu) {
+		this.menu = menu;
 	}
 
 }
