@@ -8,12 +8,12 @@ import javax.swing.JCheckBoxMenuItem;
  * 
  * @author Stefan Helfrich (University of Konstanz)
  */
-public class ChannelMenuItem extends JCheckBoxMenuItem implements OverlayListener {
+public class OverlayCheckBoxMenuItem extends JCheckBoxMenuItem implements OverlayListener {
 	
 	/**
 	 * @throws HeadlessException
 	 */
-	public ChannelMenuItem() throws HeadlessException {
+	public OverlayCheckBoxMenuItem() throws HeadlessException {
 		// TODO Auto-generated constructor stub
 	}
 
@@ -21,7 +21,7 @@ public class ChannelMenuItem extends JCheckBoxMenuItem implements OverlayListene
 	 * @param label
 	 * @throws HeadlessException
 	 */
-	public ChannelMenuItem(String label) throws HeadlessException {
+	public OverlayCheckBoxMenuItem(String label) throws HeadlessException {
 		super(label);
 		// TODO Auto-generated constructor stub
 	}
@@ -31,7 +31,7 @@ public class ChannelMenuItem extends JCheckBoxMenuItem implements OverlayListene
 	 * @param state
 	 * @throws HeadlessException
 	 */
-	public ChannelMenuItem(String label, boolean state) throws HeadlessException {
+	public OverlayCheckBoxMenuItem(String label, boolean state) throws HeadlessException {
 		super(label, state);
 		// TODO Auto-generated constructor stub
 	}

@@ -1,14 +1,10 @@
 // TODO Missing license header
 
-import java.awt.CheckboxMenuItem;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Insets;
-import java.awt.MenuItem;
 import java.awt.Point;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
@@ -18,6 +14,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.border.Border;
 
 import ij.gui.Roi;
@@ -29,7 +26,7 @@ import ij.process.LUT;
  * 
  * @author Stefan Helfrich (University of Konstanz)
  */
-class MontageItem extends JButton implements ActionListener, ItemListener {
+class MontageItem extends JButton implements ItemListener {
 
 	private List<MontageItemOverlay> overlays = new ArrayList<>();
 	private MontageItemPopup menu;
@@ -129,26 +126,6 @@ class MontageItem extends JButton implements ActionListener, ItemListener {
 		return false;
 	}
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		// TODO Make event handling more concise
-		if (e.getSource() instanceof MenuItem) {
-			MenuItem item = (MenuItem) e.getSource();
-			if (item.getName().equals("clearItem")) {
-				overlays.forEach(overlay -> overlay.setDrawn(false));
-				menu.clearMenu();
-			} else if (item.getName().equals("compositeItem")) {
-				for (int i = 0; i < tool.getImp().getNChannels(); i++) {
-					overlays.get(i).setDrawn(true);
-				}
-				menu.composite();
-			}
-		}
-		
-		invalidate();
-		repaint();
-	}
-
 	/**
 	 * TODO Documentation
 	 * 
@@ -186,8 +163,8 @@ class MontageItem extends JButton implements ActionListener, ItemListener {
 
 	@Override
 	public void itemStateChanged(ItemEvent e) {
-		if (e.getSource() instanceof CheckboxMenuItem) {
-			CheckboxMenuItem item = (CheckboxMenuItem) e.getSource();
+		if (e.getSource() instanceof JCheckBoxMenuItem) {
+			JCheckBoxMenuItem item = (JCheckBoxMenuItem) e.getSource();
 			
 			if (item.getName().equals("roiItem")) {
 				if (e.getStateChange() == ItemEvent.SELECTED) {

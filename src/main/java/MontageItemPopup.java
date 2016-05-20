@@ -30,20 +30,28 @@ class MontageItemPopup extends JPopupMenu implements ItemListener {
 	private MontageItem item;
 
 	private JMenuItem clearItem;
-	private JMenuItem compositeItem;
-	private JCheckBoxMenuItem roiItem;
-	private JCheckBoxMenuItem scalebarItem;
+	private OverlayCheckBoxMenuItem roiItem;
+	private OverlayCheckBoxMenuItem scalebarItem;
 	private Map<JMenu, List<JCheckBoxMenuItem>> menuItems = new HashMap<>();
 	
 	private void init() {
 		clearItem = new JMenuItem("Clear");
 		clearItem.setName("clearItem");
-		clearItem.addActionListener(item);
-		this.add(clearItem);
 
+		roiItem = new OverlayCheckBoxMenuItem("ROI", false);
+		roiItem.setName("roiItem");
+
+		scalebarItem = new OverlayCheckBoxMenuItem("Scalebar", false);
+		scalebarItem.setName("scalebarItem");
+
+		this.add(clearItem);
+		
 		for (ImagePlus imp : tool.getImps()) {
 			ImpMenu impMenu = new ImpMenu(imp.getTitle());
 			this.add(impMenu);
+			
+			JMenuItem compositeItem = new JMenuItem("Composite");
+			compositeItem.setName("compositeItem");
 			
 			// For all available channels in the image
 			List<JCheckBoxMenuItem> channelItems = new ArrayList<>();
@@ -51,33 +59,39 @@ class MontageItemPopup extends JPopupMenu implements ItemListener {
 				if (itemOverlay instanceof ChannelOverlay) {
 					ChannelOverlay channelOverlay = (ChannelOverlay) itemOverlay;
 					if (channelOverlay.getImp() == imp) {
-						ChannelMenuItem channelItem = new ChannelMenuItem(channelOverlay.getNameForPopup());
+						OverlayCheckBoxMenuItem channelItem = new OverlayCheckBoxMenuItem(channelOverlay.getNameForPopup());
 						channelItems.add(channelItem);
 						
 						channelItem.addItemListener(channelOverlay); // TODO Dedicated Controller?
 						channelItem.addItemListener(this); // TODO Dedicated Controller?
 						channelOverlay.addOverlayListener(channelItem);
 						
+						// Make the channelOverlay listen to the clear and
+						// composite menu entries
+						compositeItem.addActionListener(channelOverlay);
+						clearItem.addActionListener(channelOverlay);
+						
 						impMenu.add(channelItem);
 					}
+				} else if (itemOverlay instanceof RoiOverlay) {
+					RoiOverlay roiOverlay = (RoiOverlay) itemOverlay;
+					clearItem.addActionListener(roiOverlay);
+					roiItem.addItemListener(roiOverlay);
+					roiOverlay.addOverlayListener(roiItem);
+				} else if (itemOverlay instanceof ScalebarOverlay) {
+					ScalebarOverlay scalebarOverlay = (ScalebarOverlay) itemOverlay;
+					clearItem.addActionListener(scalebarOverlay);
+					scalebarItem.addItemListener(scalebarOverlay);
+					scalebarOverlay.addOverlayListener(scalebarItem);
 				}
 			}
 			menuItems.put(impMenu, channelItems);
 			
-			compositeItem = new JMenuItem("Composite");
-			compositeItem.setName("compositeItem");
-			compositeItem.addActionListener(item);
 			impMenu.add(compositeItem);
 		}
 
-		roiItem = new JCheckBoxMenuItem("ROI", false);
-		roiItem.setName("roiItem");
-		roiItem.addItemListener(item);
+		
 		this.add(roiItem);
-
-		scalebarItem = new JCheckBoxMenuItem("Scalebar", false);
-		scalebarItem.setName("scalebarItem");
-		scalebarItem.addItemListener(item);
 		this.add(scalebarItem);
 		
 		setInitialized(true);
@@ -85,36 +99,6 @@ class MontageItemPopup extends JPopupMenu implements ItemListener {
 
 	public void update() {
 		// TODO
-	}
-	
-	public void clearMenu() {
-		clearChannels();
-		clearRoi();
-		clearScalebar();
-	}
-
-	private void clearChannels() {
-		for (Entry<JMenu, List<JCheckBoxMenuItem>> entry : menuItems.entrySet()) {
-			for (JCheckBoxMenuItem channelItem : entry.getValue()) {
-				channelItem.setState(false);
-			}
-		}
-	}
-	
-	private void clearRoi() {
-		roiItem.setState(false);
-	}
-	
-	private void clearScalebar() {
-		scalebarItem.setState(false);
-	}
-
-	public void composite() {
-		for (Entry<JMenu, List<JCheckBoxMenuItem>> entry : menuItems.entrySet()) {
-			for (JCheckBoxMenuItem channelItem : entry.getValue()) {
-				channelItem.setState(true);
-			}
-		}
 	}
 
 	/**

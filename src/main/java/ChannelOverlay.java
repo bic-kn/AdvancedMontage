@@ -2,10 +2,14 @@
 
 import java.awt.Color;
 import java.awt.ItemSelectable;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.LinkedList;
 import java.util.List;
+
+import javax.swing.JMenuItem;
 
 import ij.ImagePlus;
 import ij.plugin.Colors;
@@ -16,7 +20,7 @@ import ij.process.LUT;
  * 
  * @author Stefan Helfrich (University of Konstanz)
  */
-public class ChannelOverlay extends MontageItemOverlay implements ItemListener {
+public class ChannelOverlay extends MontageItemOverlay implements ActionListener {
 
 	/** The channel that {@code this} overlay represents */
 	private int channel;
@@ -80,15 +84,6 @@ public class ChannelOverlay extends MontageItemOverlay implements ItemListener {
 		this.imp = imp;
 	}
 
-	@Override
-	public void itemStateChanged(ItemEvent e) {
-		if (e.getStateChange() == ItemEvent.SELECTED) {
-			setDrawn(true);
-		} else if (e.getStateChange() == ItemEvent.DESELECTED) {
-			setDrawn(false);
-		}
-	}
-
 	public String getNameForPopup() {
 		String channelName = "Channel " + getChannel();
 		Color maxColor = getColor();
@@ -102,6 +97,21 @@ public class ChannelOverlay extends MontageItemOverlay implements ItemListener {
 		}
 
 		return channelName + " - " + lutName;
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if (e.getSource() instanceof JMenuItem) {
+			JMenuItem sourceMenuItem = (JMenuItem) e.getSource();
+			switch (sourceMenuItem.getName()) {
+			case "compositeItem":
+				setDrawn(true);
+				break;
+			case "clearItem":
+				setDrawn(false);
+				break;
+			}
+		}
 	}
 
 }

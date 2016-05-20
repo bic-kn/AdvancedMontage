@@ -1,4 +1,6 @@
 import java.awt.Color;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -7,7 +9,7 @@ import java.util.List;
  * 
  * @author Stefan Helfrich (University of Konstanz)
  */
-public abstract class MontageItemOverlay implements OverlayListenable {
+public abstract class MontageItemOverlay implements OverlayListenable, ItemListener {
 	
 	List<OverlayListener> listeners = new LinkedList<>();
 	
@@ -43,6 +45,15 @@ public abstract class MontageItemOverlay implements OverlayListenable {
 	@Override
 	public void removeOverlayListener(OverlayListener l) {
 		listeners.remove(l);
+	}
+
+	@Override
+	public void itemStateChanged(ItemEvent e) {
+		if (e.getStateChange() == ItemEvent.SELECTED) {
+			setDrawn(true);
+		} else if (e.getStateChange() == ItemEvent.DESELECTED) {
+			setDrawn(false);
+		}
 	}
 
 }
