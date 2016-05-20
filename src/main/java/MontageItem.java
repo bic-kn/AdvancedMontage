@@ -54,16 +54,24 @@ class MontageItem extends JButton implements ItemListener {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				if (e.isPopupTrigger()) {
-					if (!menu.isInitialized()) {
-						add(menu);
-					}
-
-					menu.show(e.getComponent(), e.getX(), e.getY());
+					doPop(e);
 				}
 			}
 
 			@Override
-			public void mouseReleased(MouseEvent e) { /* Not used */ }
+			public void mouseReleased(MouseEvent e) {
+				if (e.isPopupTrigger()) {
+					doPop(e);
+				}
+			}
+
+			private void doPop(MouseEvent e) {
+				if (!menu.isInitialized()) {
+					add(menu);
+				}
+
+				menu.show(e.getComponent(), e.getX(), e.getY());
+			}
 
 			@Override
 			public void mouseEntered(MouseEvent e) { /* Not used */ }
