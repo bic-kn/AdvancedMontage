@@ -243,6 +243,11 @@ public class ComponentMover extends MouseAdapter
 	@Override
 	public void mousePressed(MouseEvent e)
 	{
+		// Popup opening clicks are ignored
+		if (e.isPopupTrigger()) {
+			return;
+		}
+
 		source = e.getComponent();
 		int width  = source.getSize().width  - dragInsets.left - dragInsets.right;
 		int height = source.getSize().height - dragInsets.top - dragInsets.bottom;
