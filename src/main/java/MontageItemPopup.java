@@ -110,8 +110,8 @@ class MontageItemPopup extends JPopupMenu implements ItemListener {
 
 	@Override
 	public void itemStateChanged(ItemEvent e) {
-		if (e.getSource() instanceof CheckboxMenuItem) {
-			CheckboxMenuItem checkbox = (CheckboxMenuItem) e.getSource();
+		if (e.getSource() instanceof OverlayCheckBoxMenuItem) {
+			OverlayCheckBoxMenuItem checkbox = (OverlayCheckBoxMenuItem) e.getSource();
 			
 			if (e.getStateChange() == ItemEvent.SELECTED) {
 				disableOtherSubmenus(checkbox);
@@ -135,7 +135,7 @@ class MontageItemPopup extends JPopupMenu implements ItemListener {
 	 * 
 	 * @param checkbox
 	 */
-	private void enableOtherSubmenus(CheckboxMenuItem checkbox) {
+	private void enableOtherSubmenus(OverlayCheckBoxMenuItem checkbox) {
 		for (Entry<JMenu, List<JCheckBoxMenuItem>> entry : getMenuItems().entrySet()) {
 			if (!entry.getValue().contains(checkbox)) {
 				entry.getKey().setEnabled(true);
@@ -149,7 +149,7 @@ class MontageItemPopup extends JPopupMenu implements ItemListener {
 	 * 
 	 * @param checkbox
 	 */
-	private void disableOtherSubmenus(CheckboxMenuItem checkbox) {
+	private void disableOtherSubmenus(OverlayCheckBoxMenuItem checkbox) {
 		for (Entry<JMenu, List<JCheckBoxMenuItem>> entry : getMenuItems().entrySet()) {
 			if (!entry.getValue().contains(checkbox)) {
 				entry.getKey().setEnabled(false);
