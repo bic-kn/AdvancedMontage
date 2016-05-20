@@ -108,6 +108,9 @@ public class MontagePanel extends JPanel implements ComponentListener {
 	}
 
 	public void setSnapSize() {
+		if (getComponentCount() == 0 || getComponents()[0] == null) {
+			return;
+		}
 		cm.setSnapSize(new Dimension(getComponents()[0].getWidth(), getComponents()[0].getHeight()));
 	}
 	
