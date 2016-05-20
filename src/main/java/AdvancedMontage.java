@@ -5,6 +5,7 @@ import org.scijava.convert.ConvertService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.prefs.PrefService;
+import org.scijava.ui.UIService;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -32,6 +33,9 @@ public class AdvancedMontage implements Command {
 	@Parameter
 	private PrefService prefService;
 	
+	@Parameter
+	private UIService uiService;
+	
 	/** TODO Documentation */
 	private MontageFrame montageFrame;
 	
@@ -48,6 +52,23 @@ public class AdvancedMontage implements Command {
 		List<ImagePlus> imps = new LinkedList<>();
 		for (int id : WindowManager.getIDList()) {
 			imps.add(WindowManager.getImage(id));
+		}
+		
+		int firstWidth = -1;
+		int firstHeight = -1;
+		for (ImagePlus imp : imps) {
+			if (firstWidth < 0 && firstHeight < 0) {
+				firstWidth = imp.getWidth();
+				firstHeight = imp.getHeight();
+				continue;
+			}
+			
+			if (imp.getWidth() != firstWidth || imp.getHeight() != firstHeight) {
+				imps.clear();
+				imps.add(dataset);
+				
+				uiService.showDialog("Open images differ in size. Continuing with the one in focus.");
+			}
 		}
 		tool.setImps(imps);
 
