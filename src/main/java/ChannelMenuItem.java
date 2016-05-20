@@ -1,8 +1,6 @@
 // TODO Missing license header
 
-import java.awt.CheckboxMenuItem;
 import java.awt.HeadlessException;
-
 import javax.swing.JCheckBoxMenuItem;
 
 /**
@@ -11,7 +9,7 @@ import javax.swing.JCheckBoxMenuItem;
  * @author Stefan Helfrich (University of Konstanz)
  */
 public class ChannelMenuItem extends JCheckBoxMenuItem implements OverlayListener {
-
+	
 	/**
 	 * @throws HeadlessException
 	 */
@@ -40,7 +38,7 @@ public class ChannelMenuItem extends JCheckBoxMenuItem implements OverlayListene
 
 	@Override
 	public void overlayChanged(OverlayChangeEvent e) {
-		setState(e.getSource().isDrawn());
+		setSelected(e.getSource().isDrawn());
 	}
 
 }

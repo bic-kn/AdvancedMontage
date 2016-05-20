@@ -1,10 +1,6 @@
 import java.awt.CheckboxMenuItem;
-import java.awt.Menu;
-import java.awt.MenuItem;
-import java.awt.PopupMenu;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.security.cert.CertPathChecker;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,16 +13,18 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import ij.ImagePlus;
-import ij.process.LUT;
 
 class MontageItemPopup extends JPopupMenu implements ItemListener {
 
 	private MontageTool tool;
 	
-	public MontageItemPopup(MontageTool tool) {
+	private boolean initialized = false;
+
+	public MontageItemPopup(MontageItem item, MontageTool tool) {
 		this.tool = tool;
+		this.item = item;
 		
-		// FIXME Call init()
+		init();
 	}
 
 	private MontageItem item;
@@ -37,9 +35,7 @@ class MontageItemPopup extends JPopupMenu implements ItemListener {
 	private JCheckBoxMenuItem scalebarItem;
 	private Map<JMenu, List<JCheckBoxMenuItem>> menuItems = new HashMap<>();
 	
-	public void init() {
-		this.item = (MontageItem) getParent();
-
+	private void init() {
 		clearItem = new JMenuItem("Clear");
 		clearItem.setName("clearItem");
 		clearItem.addActionListener(item);
@@ -55,15 +51,12 @@ class MontageItemPopup extends JPopupMenu implements ItemListener {
 				if (itemOverlay instanceof ChannelOverlay) {
 					ChannelOverlay channelOverlay = (ChannelOverlay) itemOverlay;
 					if (channelOverlay.getImp() == imp) {
-						ChannelMenuItem channelItem = new ChannelMenuItem(channelOverlay.getNameForPopup(),
-								channelOverlay.isDrawn());
+						ChannelMenuItem channelItem = new ChannelMenuItem(channelOverlay.getNameForPopup());
 						channelItems.add(channelItem);
-						channelItem.addItemListener(channelOverlay);
-						channelItem.addItemListener(this);
-						channelOverlay.addOverlayListener(channelItem);
 						
-						// Force sync between overlay and menu item
-						channelOverlay.setDrawn(channelOverlay.isDrawn());
+						channelItem.addItemListener(channelOverlay); // TODO Dedicated Controller?
+						channelItem.addItemListener(this); // TODO Dedicated Controller?
+						channelOverlay.addOverlayListener(channelItem);
 						
 						impMenu.add(channelItem);
 					}
@@ -86,6 +79,8 @@ class MontageItemPopup extends JPopupMenu implements ItemListener {
 		scalebarItem.setName("scalebarItem");
 		scalebarItem.addItemListener(item);
 		this.add(scalebarItem);
+		
+		setInitialized(true);
 	}
 
 	public void update() {
@@ -176,6 +171,20 @@ class MontageItemPopup extends JPopupMenu implements ItemListener {
 				entry.getKey().setEnabled(false);
 			}
 		}
+	}
+
+	/**
+	 * @return the initialized
+	 */
+	public boolean isInitialized() {
+		return initialized;
+	}
+
+	/**
+	 * @param initialized the initialized to set
+	 */
+	private void setInitialized(boolean initialized) {
+		this.initialized = initialized;
 	}
 
 }

@@ -47,13 +47,6 @@ public class MontagePanel extends JPanel {
 				for (int c = 0; c < imp.getNChannels(); c++) {
 					ChannelOverlay defaultChannelOverlay = new ChannelOverlay(imp, c);
 					defaultOverlays.add(defaultChannelOverlay);
-
-					// Set the defaults according to the active image (i.e. tool.getImp())
-					if (imp == tool.getImp()) {
-						if (i == c || i == numberOfChannels) {
-							defaultChannelOverlay.setDrawn(true);
-						}
-					}
 				}
 			}
 
@@ -66,9 +59,43 @@ public class MontagePanel extends JPanel {
 			defaultOverlays.add(scaleOverlay);
 			
 			MontageItem item = new MontageItem(tool, defaultOverlays);
+			MontageItemPopup montageItemPopup = new MontageItemPopup(item, tool);
+			item.setMenu(montageItemPopup);
+
+			// Defaults: initialize each channel individually plus a composite
+			if (i <= numberOfChannels) {
+				initializeOverlay(i, numberOfChannels, defaultOverlays);
+			}
 
 			this.add(item);
 			cm.registerComponent(item);
+		}
+	}
+
+	/**
+	 * TODO Documentation
+	 * 
+	 * @param tileId
+	 * @param numberOfChannels
+	 * @param defaultOverlays
+	 */
+	private void initializeOverlay(int tileId, int numberOfChannels,
+			List<MontageItemOverlay> defaultOverlays) {
+		for (MontageItemOverlay itemOverlay : defaultOverlays) {
+			if (itemOverlay instanceof ChannelOverlay) {
+				ChannelOverlay channelOverlay = (ChannelOverlay) itemOverlay;
+				// Use the active window (tool.getImp()) for defauls
+				if (channelOverlay.getImp() == tool.getImp()) {
+					if (tileId < numberOfChannels && channelOverlay.getChannel() == tileId) {
+						// Draw exactly one channel
+						channelOverlay.setDrawn(true);
+						break;
+					} else if (tileId == numberOfChannels && channelOverlay.getChannel() < numberOfChannels) {
+						// In the composite tile, all available channels are drawn
+						channelOverlay.setDrawn(true);
+					}
+				}
+			}
 		}
 	}
 

@@ -48,59 +48,31 @@ class MontageItem extends JButton implements ActionListener, ItemListener {
 		this.setContentAreaFilled(false);
 		this.setBorderPainted(true);
 		this.setBorder(new MontagePanelItemBorder());
-		
-		addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// Show popup menu
-				// MontageItemPopup menu = new MontageItemPopup();
-				// menu.show(e.getComponent(), e.getX(), e.getY());
-
-				// Somehow get available channels
-
-				// Add composite
-			}
-
-		});
 
 		addMouseListener(new MouseListener() {
 
 			@Override
-			public void mouseClicked(MouseEvent e) {
-			}
+			public void mouseClicked(MouseEvent e) { /* Not used */ }
 
 			@Override
 			public void mousePressed(MouseEvent e) {
 				if (e.isPopupTrigger()) {
-					doPop(e);
+					if (!menu.isInitialized()) {
+						add(menu);
+					}
+
+					menu.show(e.getComponent(), e.getX(), e.getY());
 				}
 			}
 
 			@Override
-			public void mouseReleased(MouseEvent e) {
-				if (e.isPopupTrigger()) {
-					doPop(e);
-				}
-			}
-
-			private void doPop(MouseEvent e) {
-				if (menu == null) {
-					menu = new MontageItemPopup(tool);
-					add(menu);
-					menu.init();
-				}
-				
-				menu.show(e.getComponent(), e.getX(), e.getY());
-			}
+			public void mouseReleased(MouseEvent e) { /* Not used */ }
 
 			@Override
-			public void mouseEntered(MouseEvent e) {
-			}
+			public void mouseEntered(MouseEvent e) { /* Not used */ }
 
 			@Override
-			public void mouseExited(MouseEvent e) {
-			}
+			public void mouseExited(MouseEvent e) { /* Not used */ }
 
 		});
 	}
@@ -392,6 +364,13 @@ class MontageItem extends JButton implements ActionListener, ItemListener {
 	 */
 	public boolean hasDrawnOverlay() {
 		return overlays.stream().anyMatch(o -> o.isDrawn());
+	}
+
+	/**
+	 * @param menu the menu to set
+	 */
+	public void setMenu(MontageItemPopup menu) {
+		this.menu = menu;
 	}
 
 }
