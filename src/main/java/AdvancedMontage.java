@@ -21,7 +21,7 @@ import ij.WindowManager;
  * 
  * @author Stefan Helfrich (University of Konstanz)
  */
-@Plugin(type = Command.class, menuPath = "Plugins>BIC>Montage")
+@Plugin(type = Command.class, menuPath = "BIC>Montage")
 public class AdvancedMontage implements Command {
 
 	@Parameter
