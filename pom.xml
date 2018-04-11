@@ -6,42 +6,79 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>sc.fiji</groupId>
-		<artifactId>pom-fiji</artifactId>
-		<version>22.3.0</version>
+		<groupId>org.scijava</groupId>
+		<artifactId>pom-scijava</artifactId>
+		<version>20.1.0</version>
 		<relativePath />
 	</parent>
 
+	<groupId>kn.uni.bic</groupId>
 	<artifactId>Advanced_Montage</artifactId>
 	<version>0.3.4-SNAPSHOT</version>
 
 	<name>plugins/Advanced_Montage.jar</name>
 	<description>A plugin with advanced functionality for montage creation. Borrows ideas from Make_Montage as well as the Magic Montage macro toolset.</description>
+	<url>https://bioimagingcenter.uni-konstanz.de</url>
+	<inceptionYear>2016</inceptionYear>
+	<organization>
+		<name>Bioimaging Center, University of Konstanz</name>
+		<url>http://bioimagingcenter.uni-konstanz.de</url>
+	</organization>
+	<licenses>
+		<license>
+			<name>Simplified BSD License</name>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
 
 	<developers>
 		<developer>
 			<id>stelfrich</id>
 			<name>Stefan Helfrich</name>
-			<email>stefan.helfrich@uni-konstanz.de</email>
-			<url>http://bioimagingcenter.uni-konstanz.de</url>
-			<organization>University of Konstanz</organization>
-			<organizationUrl>http://bioimagingcenter.uni-konstanz.de</organizationUrl>
+			<url>https://imagej.net/User:Stelfrich</url>
 			<roles>
-				<role>architect</role>
+				<role>founder</role>
+				<role>lead</role>
 				<role>developer</role>
+				<role>debugger</role>
+				<role>reviewer</role>
+				<role>support</role>
+				<role>maintainer</role>
 			</roles>
 		</developer>
 	</developers>
 
-	<!-- <scm>
-		<connection>scm:git:git://github.com/imagej/minimal-ij1-plugin</connection>
-		<developerConnection>scm:git:git@github.com:imagej/minimal-ij1-plugin</developerConnection>
+	<contributors>
+		<contributor>
+			<name>None</name>
+		</contributor>
+	</contributors>
+
+	<mailingLists>
+		<mailingList>
+			<name>None</name>
+		</mailingList>
+	</mailingLists>
+
+	<scm>
+		<connection>scm:git:git://github.com/bic-kn/AdvancedMontage</connection>
+		<developerConnection>scm:git:git@github.com:bic-kn/AdvancedMontage</developerConnection>
 		<tag>HEAD</tag>
-		<url>https://github.com/imagej/minimal-ij1-plugin</url>
-	</scm> -->
+		<url>https://github.com/bic-kn/AdvancedMontage</url>
+	</scm>
+	<issueManagement>
+		<system>GitHub Issues</system>
+		<url>https://github.com/bic-kn/AdvancedMontage/issues</url>
+	</issueManagement>
+	<ciManagement>
+		<system>None</system>
+	</ciManagement>
 
 	<properties>
 		<main-class>MontageTool</main-class>
+		<license.licenseName>bsd_2</license.licenseName>
+		<license.copyrightOwners>Board of Regents of the University of Konstanz.</license.copyrightOwners>
+		<license.projectName>Advanced Montage.</license.projectName>
 	</properties>
 
 	<dependencies>
