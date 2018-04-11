@@ -80,17 +80,4 @@ public class AdvancedMontage implements Command {
 		tool.run("");
 	}
 
-	/** Tests our command. */
-	public static void main(final String... args) throws Exception {
-		// Launch ImageJ as usual.
-		final ImageJ ij = net.imagej.Main.launch(args);
-		
-		final Dataset dataset1 = (Dataset) ij.io().open("/home/stefan/Dropbox/Konstanz/Chovancova/cell_seg_max_proj.tif");
-		final Dataset dataset2 = (Dataset) ij.io().open("/home/stefan/Pictures/hela-cells.tif");
-		ij.ui().show(dataset1);
-		ij.ui().show(dataset2);
-		
-		ij.command().run(AdvancedMontage.class, true);
-	}
-	
 }
